@@ -1,43 +1,24 @@
-from flask import Flask, jsonify
-import hashlib
+from fastapi import FastAPI
 
-app = Flask(__name__)
+app = FastAPI(title="Bar Core Service")
 
-@app.route("/")
+@app.get("/")
 def root():
-    return jsonify({"service": "Supporting", "framework": "Flask", "status": "running"})
+    return {"service": "Core", "framework": "FastAPI", "status": "running"}
 
-@app.route("/api/hash/<text>")
-def hash_endpoint(text):
-    result = hashlib.sha256(text.encode()).hexdigest()
-    return jsonify({
-        "request": text,
-        "result": result
-    })
+@app.get("/api/menu")
+def get_menu():
+    return {
+        "request": "menu",
+        "result": [
+            {"id": 1, "name": "Пиво", "price": 300},
+            {"id": 2, "name": "Коктейль", "price": 450}
+        ]
+    }
 
-@app.route("/api/dashboard")
-def dashboard():
-    return jsonify({
-        "request": "dashboard",
-        "result": {
-            "categories": ["Янв", "Фев", "Мар", "Апр"],
-            "series": [
-                {"name": "Бронирования", "data": [12, 19, 8, 24]},
-                {"name": "Заказы", "data": [45, 60, 30, 55]}
-            ]
-        }
-    })
-
-@app.route("/api/about")
-def about():
-    return jsonify({
-        "request": "about",
-        "result": {
-            "project": "Bar Web App",
-            "team": 4,
-            "stack": "FastAPI + Flask + PostgreSQL"
-        }
-    })
-
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+@app.get("/api/menu/secret")
+def get_secret_menu():
+    return {
+        "request": "secret_menu",
+        "result": [{"id": 99, "name": "Олений пенис", "price": 500, "volume_ml": 50}]
+    }
