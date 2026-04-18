@@ -1,0 +1,383 @@
+/* === ОБНУЛЕНИЕ И ОСНОВНЫЕ ЦВЕТА === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+@font-face {
+    font-family: 'Madaline';
+    src: url('fonts/Madaline-Demo.otf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --black: #0a0a0a;       /* Глубокий черный */
+    --pink: #ff69b4;        /* Яркий розовый (Hot Pink) */
+    --dark-pink: #d4469a;    /* Темно-розовый для акцентов */
+    --light-pink: #ffb6c1;   /* Светло-розовый (Light Pink) для текстур */
+    --white: #f5f5f5;        /* Немного теплый белый для текста */
+}
+
+body {
+    font-family: 'Madaline';
+    src: url('fonts/Madaline-Demo.otf') format('truetype');
+    background-color: var(--black);
+    color: var(--white);
+    line-height: 1.6;
+}
+
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* === ТИПОГРАФИКА === */
+h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+h2 {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    text-align: center;
+    color: var(--pink);
+    position: relative;
+    padding-bottom: 15px;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--pink), transparent);
+}
+
+/* === ШАПКА === */
+header {
+    background-color: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(5px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255, 105, 180, 0.3);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+}
+
+.logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--pink);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+}
+
+.logo span {
+    color: var(--white);
+    font-weight: 400;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+}
+
+nav a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+    font-size: 1.1rem;
+}
+
+nav a:hover {
+    color: var(--pink);
+}
+
+/* === ГЛАВНЫЙ ЭКРАН (HERO) === */
+.hero {
+    height: 80vh;
+    min-height: 500px;
+    background: linear-gradient(127deg, rgba(10,10,10,0.9) 0%, rgba(0, 0, 0, 0.8) 100%), no-repeat center center/cover;
+    background-attachment: fixed; /* Эффект параллакса */
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero h1 {
+    font-family: 'Madaline', sans-serif;
+    font-size: 10rem;
+    font-weight: lighter;
+    color: var(--pink);
+    text-shadow: 3px 3px 0 var(--black), 0 0 30px rgba(255, 105, 180, 0.7);
+    margin-bottom: 20px;
+
+    /* Важно! Убираем лишние расстояния */
+    letter-spacing: 0px;  /* или даже отрицательное значение */
+    word-spacing: normal;
+
+    /* Добавляем плавность */
+    font-kerning: normal;  /* Включаем встроенное сглаживание */
+    text-rendering: optimizeLegibility;
+
+}
+
+.hero p {
+    font-family: 'Gebrie Monika';
+    src: url('fonts/GebrieMonika.otf') format('opentype');
+    font-weight: bold;
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    color: var(--white);
+}
+
+.btn {
+    font-family: 'Gebrie Monika';
+    src: url('fonts/GebrieMonika.otf') format('opentype');
+    font-weight: bold;
+    display: inline-block;
+    background-color: var(--pink);
+    color: var(--black);
+    padding: 12px 40px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    border: 2px solid var(--pink);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn:hover {
+    background-color: transparent;
+    color: var(--pink);
+}
+
+/* === СЕКЦИЯ О БАРЕ === */
+.about {
+    padding: 80px 0;
+    background-color: var(--black);
+}
+
+.about-content {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.about-text {
+    flex: 1;
+}
+
+.about-text p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    color: #ccc;
+}
+
+.about-text p:first-of-type {
+    font-size: 1.3rem;
+    color: var(--pink);
+    font-weight: 600;
+}
+
+.about-image {
+    flex: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 3px solid var(--pink);
+    box-shadow: 0 0 30px rgba(255, 105, 180, 0.3);
+}
+
+.about-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.about-image:hover img {
+    transform: scale(1.05);
+}
+
+/* === СЕКЦИЯ МЕНЮ (КОМПАКТНО В ОДНУ СТРОКУ) === */
+.menu {
+    padding: 60px 0;
+    background: linear-gradient(180deg, var(--black) 0%, #1a0a12 100%);
+}
+
+.menu-items {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 колонки в ряд */
+    gap: 20px; /* Уменьшили отступы */
+    margin-top: 40px;
+}
+
+.menu-card {
+    background: rgba(20, 20, 20, 0.7);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 105, 180, 0.3);
+    border-radius: 15px;
+    padding: 20px 15px; /* Уменьшили отступы внутри */
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.menu-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--pink);
+    box-shadow: 0 10px 30px rgba(255, 105, 180, 0.2);
+}
+
+.menu-icon {
+    font-size: 2.5rem; /* Уменьшили иконку */
+    margin-bottom: 15px;
+}
+
+.menu-card h3 {
+    font-size: 1.4rem; /* Уменьшили заголовок */
+    color: var(--pink);
+    margin-bottom: 12px;
+}
+
+.menu-card ul {
+    list-style: none;
+    text-align: left;
+}
+
+.menu-card li {
+    padding: 6px 0; /* Уменьшили отступы между пунктами */
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    color: #ddd;
+    font-size: 0.9rem; /* Уменьшили шрифт */
+}
+
+.menu-card li:last-child {
+    border-bottom: none;
+}
+
+.price {
+    color: var(--pink);
+    font-weight: bold;
+    font-size: 0.95rem; /* Уменьшили цену */
+}
+
+/* === КОНТАКТЫ === */
+.contact {
+    padding: 80px 0;
+    background-color: var(--black);
+}
+
+.contact-info {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+.contact-item {
+    text-align: center;
+    flex: 1 1 250px;
+}
+
+.contact-item i {
+    font-size: 2.5rem;
+    color: var(--pink);
+    margin-bottom: 15px;
+}
+
+.contact-item h3 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.contact-item p {
+    color: #aaa;
+}
+
+.social-links {
+    text-align: center;
+}
+
+.social-links a {
+    color: var(--white);
+    font-size: 1.8rem;
+    margin: 0 15px;
+    transition: color 0.3s ease;
+}
+
+.social-links a:hover {
+    color: var(--pink);
+}
+
+/* === ПОДВАЛ === */
+footer {
+    background-color: #050505;
+    padding: 30px 0;
+    text-align: center;
+    border-top: 1px solid rgba(255, 105, 180, 0.2);
+}
+
+/* === АДАПТАЦИЯ ДЛЯ ПЛАНШЕТОВ И ТЕЛЕФОНОВ === */
+@media (max-width: 1024px) {
+    .menu-items {
+        grid-template-columns: repeat(2, 1fr); /* 2 колонки на планшете */
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    nav ul {
+        gap: 20px;
+    }
+
+    .hero h1 {
+        font-size: 3.5rem;
+    }
+
+    .about-content {
+        flex-direction: column-reverse;
+    }
+
+    h2 {
+        font-size: 2rem;
+    }
+    
+    .menu-items {
+        grid-template-columns: 1fr; /* 1 колонка на телефоне */
+    }
+}
