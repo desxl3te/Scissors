@@ -47,13 +47,16 @@ const registerForm = document.getElementById('registerForm');
 const logoutBtn = document.getElementById('logoutBtn');
 
 const editProfileLink = document.getElementById('editProfileLink');
+const supportLink = document.getElementById('supportLink'); // Новая ссылка
+
 const editProfileForm = document.getElementById('editProfileForm');
 const editNameInput = document.getElementById('editName');
 const editAvatarInput = document.getElementById('editAvatar');
-const closeEditProfileBtn = document.querySelector('.close-edit-profile'); // ← КРЕСТИК
+const closeEditProfileBtn = document.querySelector('.close-edit-profile');
+const closeSupportBtn = document.querySelector('.close-support'); // Крестик поддержки
 
 const userNameDisplay = document.getElementById('userNameDisplay');
-const userAvatarImg = document.querySelector('.user-avatar'); 
+const userAvatarImg = document.querySelector('.user-avatar');
 
 const authModal = document.getElementById('authModal');
 const closeModalBtn = document.querySelector('.close-modal');
@@ -66,7 +69,7 @@ const switchToLogin = document.getElementById('switchToLogin');
 let isLoggedIn = false;
 let currentUser = {
     name: 'Гость Бара',
-    avatar: null 
+    avatar: null
 };
 
 if (localStorage.getItem('scissors_user')) {
@@ -91,21 +94,25 @@ function saveToLocalStorage() {
 function closeAuthModal() {
     authModal.style.display = 'none';
     document.body.style.overflow = '';
+
+    // Возвращаем видимость табов при закрытии модалки
+    const authTabs = document.querySelector('.auth-tabs');
+    if (authTabs) authTabs.style.display = 'flex';
 }
 
 function updateUI() {
     if (isLoggedIn) {
         loggedOutView.style.display = 'none';
         loggedInView.style.display = 'block';
-        
+
         if (userNameDisplay) {
             userNameDisplay.textContent = currentUser.name || 'Гость Бара';
         }
-        
+
         if (currentUser.avatar && currentUser.avatar !== '' && currentUser.avatar !== 'null') {
             userAccountBtn.innerHTML = `<img src="${currentUser.avatar}" alt="Аватар" class="user-avatar-small">`;
             userAccountBtn.classList.add('has-avatar');
-            
+
             if (userAvatarImg) {
                 userAvatarImg.src = currentUser.avatar;
                 userAvatarImg.onerror = function() { this.src = 'https://via.placeholder.com/40'; };
@@ -122,7 +129,7 @@ function updateUI() {
         } else {
             userAccountBtn.innerHTML = '<i class="fas fa-user"></i>';
             userAccountBtn.classList.remove('has-avatar');
-            
+
             if (userAvatarImg) {
                 userAvatarImg.src = 'https://via.placeholder.com/40';
             }
@@ -144,7 +151,7 @@ function updateUI() {
         loggedInView.style.display = 'none';
         userAccountBtn.innerHTML = '<i class="fas fa-user"></i>';
         userAccountBtn.classList.remove('has-avatar');
-        
+
         const avatarWrapper = document.getElementById('userAvatarWrapper');
         if (avatarWrapper) {
             avatarWrapper.innerHTML = '<i class="fas fa-user user-avatar-icon"></i>';
@@ -157,10 +164,11 @@ function updateUI() {
 
 function activateTab(tabName) {
     const authTabs = document.querySelector('.auth-tabs');
-    if (tabName === 'editProfile') {
-        authTabs.style.display = 'none';
+    // Скрываем табы только для редактирования и поддержки
+    if (tabName === 'editProfile' || tabName === 'support') {
+        if(authTabs) authTabs.style.display = 'none';
     } else {
-        authTabs.style.display = 'flex';
+        if(authTabs) authTabs.style.display = 'flex';
     }
 
     tabBtns.forEach(btn => {
@@ -184,6 +192,86 @@ function openEditProfileTab() {
     activateTab('editProfile');
 }
 
+// --- ЛОГИКА ПОДДЕРЖКИ ---
+function openSupportTab() {
+    const supportNameInput = document.getElementById('supportName');
+    const supportEmailInput = document.getElementById('supportEmail');
+
+    if (supportNameInput) supportNameInput.value = currentUser.name || '';
+    if (supportEmailInput) supportEmailInput.value = currentUser.email || '';
+
+    activateTab('support');
+}
+
+if (supportLink) {
+    supportLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        userDropdownMenu.classList.remove('active');
+        authModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        openSupportTab();
+    });
+}
+
+if (closeSupportBtn) {
+    closeSupportBtn.addEventListener('click', () => {
+        closeAuthModal();
+    });
+}
+
+const supportForm = document.getElementById('supportForm');
+if (supportForm) {
+    supportForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const submitButton = supportForm.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerText;
+        submitButton.innerText = 'Отправка...';
+        submitButton.disabled = true;
+
+        try {
+            const data = new FormData(supportForm);
+            const response = await fetch(supportForm.action, {
+                method: 'POST',
+                body: data,
+                headers: { 'Accept': 'application/json' }
+            });
+
+            if (response.ok) {
+                // Показываем красивое уведомление вместо alert
+                const thankYouModal = document.getElementById('thankYouModal');
+                if (thankYouModal) {
+                    thankYouModal.style.display = 'block';
+                    document.body.style.overflow = 'hidden';
+
+                    // Очищаем форму поддержки
+                    supportForm.reset();
+
+                    // Закрываем модалку поддержки
+                    closeAuthModal();
+
+                    // Обработчик кнопки ОК
+                    const okBtn = document.getElementById('thankYouOkBtn');
+                    if (okBtn) {
+                        okBtn.onclick = function() {
+                            thankYouModal.style.display = 'none';
+                            document.body.style.overflow = '';
+                        };
+                    }
+                }
+            } else {
+                alert('Ошибка при отправке. Попробуйте позже.');
+            }
+        } catch (error) {
+            alert('Ошибка сети.');
+        } finally {
+            submitButton.innerText = originalText;
+            submitButton.disabled = false;
+        }
+    });
+}
+// --- КОНЕЦ ЛОГИКИ ПОДДЕРЖКИ ---
+
 if (editProfileLink) {
     editProfileLink.addEventListener('click', (e) => {
         e.preventDefault();
@@ -203,10 +291,10 @@ if (closeEditProfileBtn) {
 if (editProfileForm) {
     editProfileForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        
+
         const newName = editNameInput.value.trim();
         if (newName !== '') currentUser.name = newName;
-        
+
         if (editAvatarInput && editAvatarInput.files && editAvatarInput.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -246,7 +334,7 @@ if (switchToLogin) {
 
 userAccountBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    
+
     if (!isLoggedIn) {
         authModal.style.display = 'block';
         document.body.style.overflow = 'hidden';
@@ -283,6 +371,10 @@ window.addEventListener('click', (e) => {
 loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
     isLoggedIn = true;
+    // Сохраняем email для автозаполнения в поддержке
+    const emailInput = document.getElementById('email');
+    if(emailInput) currentUser.email = emailInput.value;
+
     updateUI();
     loginForm.reset();
     closeAuthModal();
@@ -290,12 +382,17 @@ loginForm.addEventListener('submit', (e) => {
 
 registerForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    
+
     const regNameInput = document.getElementById('regName');
+    const regEmailInput = document.getElementById('regEmail');
+
     if (regNameInput && regNameInput.value.trim() !== '') {
         currentUser.name = regNameInput.value.trim();
     }
-    
+    if (regEmailInput) {
+        currentUser.email = regEmailInput.value;
+    }
+
     isLoggedIn = true;
     updateUI();
     registerForm.reset();
@@ -305,10 +402,9 @@ registerForm.addEventListener('submit', (e) => {
 logoutBtn.addEventListener('click', (e) => {
     e.preventDefault();
     isLoggedIn = false;
-    currentUser = { name: 'Гость Бара', avatar: null };
+    currentUser = { name: 'Гость Бара', avatar: null, email: '' };
     updateUI();
-    
-    // Очищаем формы
+
     if (loginForm) loginForm.reset();
     if (registerForm) registerForm.reset();
     if (editProfileForm) editProfileForm.reset();
