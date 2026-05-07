@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="styles1.css">
 </head>
 <body>
+    <!-- === ШАПКА === -->
     <header>
         <div class="container header-content">
             <div class="logo">Scissors<span>Bar</span></div>
@@ -24,20 +25,16 @@
                     </ul>
                 </nav>
 
-                <!-- === Иконка аккаунта и выпадающая панель === -->
                 <div class="user-account-wrapper">
                     <button id="userAccountBtn" class="user-account-btn" aria-label="Аккаунт">
                         <i class="fas fa-user"></i>
                     </button>
 
-                    <!-- Выпадающая панель аккаунта -->
                     <div class="user-dropdown-menu" id="userDropdownMenu">
-                        <!-- Состояние 1: Не авторизован -->
                         <div id="loggedOutView">
                             <a href="#" class="dropdown-link"><i class="fas fa-sign-in-alt"></i> Войти / Регистрация</a>
                         </div>
 
-                        <!-- Состояние 2: Авторизован -->
                         <div id="loggedInView" style="display: none;">
                             <div class="dropdown-header">
                                 <div class="user-avatar-wrapper" id="userAvatarWrapper">
@@ -66,20 +63,21 @@
 
     <div class="overlay" id="overlay"></div>
 
+    <!-- === БОКОВАЯ ПАНЕЛЬ С КРЕСТИКОМ ЗАКРЫТИЯ === -->
     <aside class="side-panel" id="sidePanel">
-        <div class="close-btn" id="closeBtn">&times;</div>
+        <div class="close-btn" id="closeBtn">&times;</div> <!-- 👈 ВОТ ОН — НА СВОЁМ МЕСТЕ -->
         <ul>
             <li><a href="#home">Главная</a></li>
-            <li><a href="https://example.com/site1" target="_blank">Бронирование столиков</a></li>
-            <li><a href="https://example.com/site2" target="_blank">Расписание мероприятий</a></li>
+            <li><a href="events.html">Расписание мероприятий</a></li>
+            <li><a href="alco-test.html">Алкотестер</a></li>
         </ul>
     </aside>
 
     <main>
-        <!-- === МОДАЛЬНОЕ ОКНО ДЛЯ ВХОДА, РЕГИСТРАЦИИ, ПРОФИЛЯ И ПОДДЕРЖКИ === -->
+        <!-- === МОДАЛЬНОЕ ОКНО === -->
         <div id="authModal" class="modal">
             <div class="modal-content">
-                <span class="close-modal">&times;</span>
+                <span class="close-modal">&times;</span> <!-- 👈 ГЛАВНЫЙ КРЕСТИК МОДАЛКИ -->
 
                 <div class="auth-tabs">
                     <button class="tab-btn active" data-tab="login">Вход</button>
@@ -90,7 +88,7 @@
 
                 <!-- Форма входа -->
                 <div id="loginTab" class="tab-content active">
-                    <div id="loginFormContainer" class="auth-container">
+                    <div class="auth-container">
                         <form id="loginForm">
                             <div class="form-group">
                                 <label for="email">Email</label>
@@ -102,7 +100,7 @@
                             </div>
                             <button type="submit" class="btn">ВОЙТИ</button>
                         </form>
-                        <p style="margin-top: 15px; text-align: center;">Нет аккаунта? <a href="#" id="switchToRegister" style="color: var(--pink);">Зарегистрироваться</a></p>
+                        <p class="auth-switch-text">Нет аккаунта? <a href="#" id="switchToRegister">Зарегистрироваться</a></p>
                     </div>
                 </div>
 
@@ -128,64 +126,53 @@
                             </div>
                             <button type="submit" class="btn">ЗАРЕГИСТРИРОВАТЬСЯ</button>
                         </form>
-                        <p style="margin-top: 15px; text-align: center;">Уже есть аккаунт? <a href="#" id="switchToLogin" style="color: var(--pink);">Войти</a></p>
+                        <p class="auth-switch-text">Уже есть аккаунт? <a href="#" id="switchToLogin">Войти</a></p>
                     </div>
                 </div>
 
-                <!-- Редактирование профиля -->
+                <!-- Редактирование профиля (БЕЗ ЛИШНЕГО КРЕСТИКА) -->
                 <div id="editProfileTab" class="tab-content">
                     <div class="auth-container">
-                        <span class="close-edit-profile">&times;</span>
-
                         <h2 class="modal-title">Редактировать профиль</h2>
-
                         <form id="editProfileForm">
                             <div class="form-group">
                                 <label for="editName">Имя</label>
                                 <input type="text" id="editName" placeholder="Ваше имя" required>
                             </div>
-
                             <div class="form-group">
                                 <label for="editAvatar">Аватарка</label>
                                 <input type="file" id="editAvatar" accept="image/*">
-                                <small style="color: #aaa; display: block; margin-top: 5px;">Выберите файл, чтобы обновить фото. Оставьте пустым, чтобы удалить.</small>
+                                <small class="form-hint">Выберите файл, чтобы обновить фото.</small>
                             </div>
-
                             <button type="submit" class="btn">Сохранить изменения</button>
                         </form>
                     </div>
                 </div>
 
-                <!-- ПОДДЕРЖКА -->
+                <!-- Поддержка (БЕЗ ЛИШНЕГО КРЕСТИКА) -->
                 <div id="supportTab" class="tab-content">
                     <div class="auth-container">
-                        <span class="close-support" style="position: absolute; top: 20px; right: 25px; font-size: 28px; color: var(--pink); cursor: pointer;">&times;</span>
-                        <h2 class="modal-title" style="text-align: center; margin-bottom: 20px; color: var(--pink);">Поддержка</h2>
+                        <h2 class="modal-title">Поддержка</h2>
                         <form action="https://formspree.io/f/xykoeyeo" method="POST" id="supportForm">
-
                             <div class="form-group">
                                 <label for="supportName">Ваше имя</label>
                                 <input type="text" name="name" id="supportName" placeholder="Ваше имя" required>
                             </div>
-
                             <div class="form-group">
-                                <label for="supportEmail">Ваш Email (для ответа)</label>
+                                <label for="supportEmail">Ваш Email</label>
                                 <input type="email" name="email" id="supportEmail" placeholder="your@email.com" required>
                             </div>
-
                             <div class="form-group">
                                 <label for="supportMessage">Сообщение</label>
-                                <textarea name="message" id="supportMessage" rows="5" placeholder="Опишите вашу проблему..." style="width: 100%; padding: 12px; background-color: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: white;" required></textarea>
+                                <textarea name="message" id="supportMessage" rows="5" placeholder="Опишите проблему..." required></textarea>
                             </div>
-
-                            <button type="submit" class="btn" style="width: 100%;">Отправить сообщение</button>
+                            <button type="submit" class="btn btn-full">Отправить сообщение</button>
                         </form>
                     </div>
                 </div>
-                <!-- КОНЕЦ ВКЛАДКИ ПОДДЕРЖКИ -->
-
             </div>
         </div>
+
         <section id="home" class="hero">
             <div class="hero-content container">
                 <h1>Scissors</h1>
@@ -289,23 +276,24 @@
                 </div>
             </div>
         </section>
-    </main>
+    </main>   <!-- 👈 MAIN ЗАКРЫВАЕТСЯ ЗДЕСЬ -->
 
-    <footer>
+    <footer>  <!-- 👈 FOOTER СРАЗУ ПОСЛЕ MAIN -->
         <div class="container">
             <p>&copy; 2024 Scissors Bar. Все права защищены.</p>
         </div>
     </footer>
 
-    <!-- ===  ОКНО УВЕДОМЛЕНИЯ "СПАСИБО" === -->
+    <!-- === ОКНО УВЕДОМЛЕНИЯ "СПАСИБО" === -->
     <div id="thankYouModal" class="modal thank-you-modal">
         <div class="modal-content thank-you-content">
-            <h2 class="modal-title" style="text-align: center; color: var(--pink); margin-bottom: 20px;">Спасибо!</h2>
-            <p style="text-align: center; color: #ccc; margin-bottom: 30px;">Ваше сообщение успешно отправлено.</p>
-            <button id="thankYouOkBtn" class="btn" style="width: 100%;">ОК</button>
+            <h2 class="modal-title">Спасибо!</h2>
+            <p class="thank-you-text">Ваше сообщение успешно отправлено.</p>
+            <button id="thankYouOkBtn" class="btn btn-full">ОК</button>
         </div>
     </div>
 
     <script src="script.js"></script>
+    <script src='//app.restoplace.cc/widget.js?h=6b49d64843a2ce63d2bb' async></script>
 </body>
 </html>
