@@ -1,8 +1,8 @@
 USE scissors_bar;
 
 -- добавление тестового пользователя
-INSERT IGNORE INTO users (id, user_name, password_hash, email, phone, role) 
-VALUES (1, 'test_user', SHA2('123456', 256), 'test@scissors.bar', '+79991234567', 'customer');
+INSERT IGNORE INTO users (id, user_name, password_hash, email, phone, avatar, role) 
+VALUES (1, 'test_user', SHA2('123456', 256), 'test@scissors.bar', '+79991234567', 'https://example.com/avatar.jpg', 'customer');
 
 -- очистка старых тестовых броней
 SET SQL_SAFE_UPDATES = 0;
