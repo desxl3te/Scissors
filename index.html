@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scissors Bar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Playfair+Display:wght@400;700;900&family=WindSong:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles1.css">
+    <!-- ✅ Подключение Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+</head>
+<body>
+    <!-- === ШАПКА === -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">Scissors<span>Bar</span></div>
+            <div class="nav-right-group">
+                <nav>
+                    <ul>
+                        <li><a href="#home">Главная</a></li>
+                        <li><a href="#about">О нас</a></li>
+                        <!-- ✅ Ссылка на PDF -->
+                        <li><a href="menu.pdf" target="_blank" rel="noopener noreferrer">Меню</a></li>
+                        <li><a href="#contact">Контакты</a></li>
+                    </ul>
+                </nav>
+
+                <div class="user-account-wrapper">
+                    <button id="userAccountBtn" class="user-account-btn" aria-label="Аккаунт">
+                        <i class="fas fa-user"></i>
+                    </button>
+
+                    <div class="user-dropdown-menu" id="userDropdownMenu">
+                        <div id="loggedOutView">
+                            <a href="#" class="dropdown-link"><i class="fas fa-sign-in-alt"></i> Войти / Регистрация</a>
+                        </div>
+
+                        <div id="loggedInView" style="display: none;">
+                            <div class="dropdown-header">
+                                <div class="user-avatar-wrapper" id="userAvatarWrapper">
+                                    <i class="fas fa-user user-avatar-icon"></i>
+                                </div>
+                                <div class="user-info">
+                                    <span class="user-name" id="userNameDisplay">Гость Бара</span>
+                                </div>
+                            </div>
+                            <hr class="dropdown-divider">
+                            <a href="#" id="editProfileLink" class="dropdown-link"><i class="fas fa-user-edit"></i> Редактировать профиль</a>
+                            <a href="#" id="supportLink" class="dropdown-link"><i class="fas fa-headset"></i> Поддержка</a>
+                            <hr class="dropdown-divider">
+                            <a href="#" id="logoutBtn" class="dropdown-link"><i class="fas fa-sign-out-alt"></i> Выйти из аккаунта</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="burger-btn" id="burgerBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- === БОКОВАЯ ПАНЕЛЬ С КРЕСТИКОМ ЗАКРЫТИЯ === -->
+    <aside class="side-panel" id="sidePanel">
+        <div class="close-btn" id="closeBtn">&times;</div> 
+        <ul>
+            <li><a href="#home">Главная</a></li>
+            <li><a href="events.html">Расписание мероприятий</a></li>
+            <li><a href="alco-test.html">Алкотестер</a></li>
+        </ul>
+    </aside>
+
+    <main>
+        <!-- === МОДАЛЬНОЕ ОКНО === -->
+        <div id="authModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span> 
+
+                <div class="auth-tabs">
+                    <button class="tab-btn active" data-tab="login">Вход</button>
+                    <button class="tab-btn" data-tab="register">Регистрация</button>
+                    <button class="tab-btn" data-tab="editProfile" style="display: none;">Редактировать</button>
+                    <button class="tab-btn" data-tab="support" style="display: none;">Поддержка</button>
+                </div>
+
+                <!-- Форма входа -->
+                <div id="loginTab" class="tab-content active">
+                    <div class="auth-container">
+                        <form id="loginForm">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" placeholder="your@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Пароль</label>
+                                <input type="password" id="password" placeholder="••••••••" required>
+                            </div>
+                            <button type="submit" class="btn">ВОЙТИ</button>
+                        </form>
+                        <p class="auth-switch-text">Нет аккаунта? <a href="#" id="switchToRegister">Зарегистрироваться</a></p>
+                    </div>
+                </div>
+
+                <!-- Форма регистрации -->
+                <div id="registerTab" class="tab-content">
+                    <div class="auth-container">
+                        <form id="registerForm">
+                            <div class="form-group">
+                                <label for="regName">Имя</label>
+                                <input type="text" id="regName" placeholder="Ваше имя" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="regEmail">Email</label>
+                                <input type="email" id="regEmail" placeholder="your@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="regPassword">Пароль</label>
+                                <input type="password" id="regPassword" placeholder="••••••••" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="regConfirmPassword">Подтвердите пароль</label>
+                                <input type="password" id="regConfirmPassword" placeholder="••••••••" required>
+                            </div>
+                            <button type="submit" class="btn">ЗАРЕГИСТРИРОВАТЬСЯ</button>
+                        </form>
+                        <p class="auth-switch-text">Уже есть аккаунт? <a href="#" id="switchToLogin">Войти</a></p>
+                    </div>
+                </div>
+
+                <!-- Редактирование профиля -->
+                <div id="editProfileTab" class="tab-content">
+                    <div class="auth-container">
+                        <h2 class="modal-title">Редактировать профиль</h2>
+                        <form id="editProfileForm">
+                            <div class="form-group">
+                                <label for="editName">Имя</label>
+                                <input type="text" id="editName" placeholder="Ваше имя" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editAvatar">Аватарка</label>
+                                <input type="file" id="editAvatar" accept="image/*">
+                                <small class="form-hint">Выберите файл, чтобы обновить фото.</small>
+                            </div>
+                            <button type="submit" class="btn">Сохранить изменения</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Поддержка -->
+                <div id="supportTab" class="tab-content">
+                    <div class="auth-container">
+                        <h2 class="modal-title">Поддержка</h2>
+                        <form action="https://formspree.io/f/xykoeyeo" method="POST" id="supportForm">
+                            <div class="form-group">
+                                <label for="supportName">Ваше имя</label>
+                                <input type="text" name="name" id="supportName" placeholder="Ваше имя" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="supportEmail">Ваш Email</label>
+                                <input type="email" name="email" id="supportEmail" placeholder="your@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="supportMessage">Сообщение</label>
+                                <textarea name="message" id="supportMessage" rows="5" placeholder="Опишите проблему..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-full">Отправить сообщение</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section id="home" class="hero">
+            <div class="hero-content container">
+                <div id="sparkles-container"></div>
+                
+                <h1>Scissors</h1>
+                <p>Острые впечатления. Смелые коктейли. Ночь в твоем вкусе.</p>
+                <a href="menu.pdf" target="_blank" rel="noopener noreferrer" class="btn">Смотреть меню</a>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container">
+                <h2>Наша история</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p>Scissors — пространство, созданное для женщин и про женщин.</p>
+                        <p>Здесь каждая деталь дышит уважением к женской силе, грации и многогранности. Чёрный цвет — символ уверенности и глубины, розовый — нежность, страсть и смелость быть собой. Мы объединили эти контрасты, чтобы создать место, где женщина чувствует себя желанной, свободной и вдохновлённой.</p>
+                        <p>Наши коктейли — как характеры: тонкие, яркие, иногда дерзкие, но всегда с идеальным балансом. Мы говорим на языке вкуса, эстетики и эмоций. Scissors — это ода женственности, где каждая гостья — главная героиня вечера.</p>
+                        <p><strong>Scissors. Острота твоей привлекательности.</strong></p>
+                    </div>
+                    <div class="about-image">
+                        <img src="images/inside%20bar.png" alt="Интерьер бара Scissors">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <div class="container">
+                <h2>Как нас найти</h2>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>Адрес</h3>
+                        <p>Москва, ул. Тверская, 15<br>Вход с черного хода, ищите розовую дверь</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-clock"></i>
+                        <h3>Часы работы</h3>
+                        <p>Пн-Чт: 18:00 — 02:00<br>Пт-Сб: 19:00 — 06:00<br>Вс: выходной</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <h3>Телефон</h3>
+                        <p>+7 (999) 123-45-67</p>
+                        <p>(Бронь по телефону)</p>
+                    </div>
+                </div>
+                <div class="social-links">
+                    <a href="https://t.me/blessingscissors" target="_blank"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </section>
+    </main>  
+
+    <footer>  
+        <div class="container">
+            <p>&copy; 2024 Scissors Bar. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <!-- === ОКНО УВЕДОМЛЕНИЯ "СПАСИБО" === -->
+    <div id="thankYouModal" class="modal thank-you-modal">
+        <div class="modal-content thank-you-content">
+            <h2 class="modal-title">Спасибо!</h2>
+            <p class="thank-you-text">Ваше сообщение успешно отправлено.</p>
+            <button id="thankYouOkBtn" class="btn btn-full">ОК</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src='//app.restoplace.cc/widget.js?h=6b49d64843a2ce63d2bb' async></script>
+</body>
+</html>
