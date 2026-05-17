@@ -76,6 +76,7 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     email VARCHAR(100) UNIQUE,
     phone VARCHAR(20),
+    avatar VARCHAR(255) DEFAULT NULL,
     role ENUM('admin', 'manager', 'customer') DEFAULT 'customer',
     is_active BOOLEAN DEFAULT TRUE,
     total_visits INT DEFAULT 0,
