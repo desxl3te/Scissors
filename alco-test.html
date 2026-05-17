@@ -9,8 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Playfair+Display:wght@400;700;900&family=WindSong:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles1.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 </head>
 <body>
+    <div id="sparkles-container"></div>
     <!-- === ШАПКА === -->
     <header>
         <div class="container header-content">
@@ -20,7 +22,8 @@
                     <ul>
                         <li><a href="index.html#home">Главная</a></li>
                         <li><a href="index.html#about">О нас</a></li>
-                        <li><a href="index.html#menu">Меню</a></li>
+                        <!-- ✅ Ссылка на PDF -->
+                        <li><a href="menu.pdf" target="_blank" rel="noopener noreferrer">Меню</a></li>
                         <li><a href="index.html#contact">Контакты</a></li>
                     </ul>
                 </nav>
@@ -76,7 +79,6 @@
     <!-- === МОДАЛЬНЫЕ ОКНА === -->
     <div id="authModal" class="modal">
         <div class="modal-content">
-            <!-- 👇 ГЛАВНЫЙ КРЕСТИК ЗАКРЫТИЯ МОДАЛКИ -->
             <span class="close-modal">&times;</span>
 
             <div class="auth-tabs">
@@ -86,7 +88,6 @@
                 <button class="tab-btn" data-tab="support" style="display: none;">Поддержка</button>
             </div>
 
-            <!-- Форма входа -->
             <div id="loginTab" class="tab-content active">
                 <div class="auth-container">
                     <form id="loginForm">
@@ -104,7 +105,6 @@
                 </div>
             </div>
 
-            <!-- Форма регистрации -->
             <div id="registerTab" class="tab-content">
                 <div class="auth-container">
                     <form id="registerForm">
@@ -130,7 +130,6 @@
                 </div>
             </div>
 
-            <!-- Редактирование профиля (БЕЗ ЛИШНЕГО КРЕСТИКА) -->
             <div id="editProfileTab" class="tab-content">
                 <div class="auth-container">
                     <h2 class="modal-title">Редактировать профиль</h2>
@@ -149,7 +148,6 @@
                 </div>
             </div>
 
-            <!-- Поддержка (БЕЗ ЛИШНЕГО КРЕСТИКА) -->
             <div id="supportTab" class="tab-content">
                 <div class="auth-container">
                     <h2 class="modal-title">Поддержка</h2>
@@ -176,6 +174,7 @@
     <!-- === КОНТЕНТ ТЕСТА === -->
     <main>
         <div class="container test-container">
+            <div id="sparkles-container"></div>
             <h2 class="page-title">Тест на трезвость</h2>
             <p class="test-description">Пройди 10 случайных вопросов. Если ответишь верно на все — докажешь, что трезв как стеклышко!</p>
 
@@ -195,11 +194,13 @@
                 <h3 id="resultTitle" class="result-title">Результат:</h3>
                 <p id="resultText" class="result-text"></p>
                 
-                <div id="winnerCoupon" class="coupon">
+                <!-- ✅ ПРОМОКОД (Скрыт по умолчанию) -->
+                <div id="winnerCoupon" class="coupon" style="display: none;">
                     <i class="fas fa-glass-cheers coupon-icon"></i>
                     <h3>ТЫ ТРЕЗВ!</h3>
-                    <p>Твой мозг работает идеально. Ты прошел тест на 100%.</p>
+                    <p>Твой мозг работает идеально. Ты прошел тест отлично.</p>
                     <p>Твой приз: <strong>Бесплатный шот "The deer penis"</strong></p>
+                    <img src="напитки/the deer penis.jpg" alt="Шот The deer penis" class="coupon-image">
                     <div class="coupon-code">SOBER-WINNER-2026</div>
                     <p class="coupon-hint">Покажи этот экран бармену.</p>
                 </div>
@@ -227,7 +228,7 @@
     <script src="script.js"></script>
     
     <script>
-        // База вопросов
+        // === БАЗА ВОПРОСОВ (30 ШТУК) ===
         const questions = [
             { q: "Сколько пальцев на одной руке?", a: ["5", "6", "4"], correct: 0 },
             { q: "Какой цвет у травы летом?", a: ["Синий", "Зеленый", "Красный"], correct: 1 },
@@ -235,18 +236,37 @@
             { q: "Столица России?", a: ["Санкт-Петербург", "Москва", "Казань"], correct: 1 },
             { q: "Сколько будет 2 + 2 * 2?", a: ["8", "6", "4"], correct: 1 },
             { q: "Как называется животное, которое дает молоко?", a: ["Корова", "Волк", "Лиса"], correct: 0 },
-            { q: "Что идет дождь, а мы мокнем?", a: ["Зонт", "Небо", "Вода"], correct: 2 },
+            { q: "Что идет, когда дождь, а мы мокнем?", a: ["Зонт", "Небо", "Вода"], correct: 2 },
             { q: "Сколько дней в неделе?", a: ["5", "7", "10"], correct: 1 },
             { q: "Какой газ мы вдыхаем?", a: ["Кислород", "Углекислый газ", "Гелий"], correct: 0 },
             { q: "Что находится между небом и землей?", a: ["Облака", "И", "Птицы"], correct: 1 },
             { q: "Сколько ног у паука?", a: ["6", "8", "4"], correct: 1 },
-            { q: "Какой месяц идет после января?", a: ["Декабрь", "Февраль", "Март"], correct: 1 }
+            { q: "Какой месяц идет после января?", a: ["Декабрь", "Февраль", "Март"], correct: 1 },
+            { q: "Сколько часов в сутках?", a: ["12", "24", "48"], correct: 1 },
+            { q: "Какой цвет у снега?", a: ["Белый", "Черный", "Синий"], correct: 0 },
+            { q: "Сколько будет 10 − 5?", a: ["3", "5", "7"], correct: 1 },
+            { q: "Какое время года идет после зимы?", a: ["Лето", "Осень", "Весна"], correct: 2 },
+            { q: "Сколько углов у квадрата?", a: ["3", "4", "5"], correct: 1 },
+            { q: "Какой напиток делают из винограда?", a: ["Чай", "Вино", "Кофе"], correct: 1 },
+            { q: "Сколько будет 3 × 3?", a: ["6", "9", "12"], correct: 1 },
+            { q: "Как называется планета, на которой мы живём?", a: ["Марс", "Земля", "Венера"], correct: 1 },
+            { q: "Сколько будет 5 + 5?", a: ["8", "10", "12"], correct: 1 },
+            { q: "Какой день идет после понедельника?", a: ["Воскресенье", "Среда", "Вторник"], correct: 2 },
+            { q: "Сколько лап у кошки?", a: ["2", "4", "6"], correct: 1 },
+            { q: "Что светит ночью на небе?", a: ["Солнце", "Луна", "Облако"], correct: 1 },
+            { q: "Сколько будет 20 : 2?", a: ["5", "10", "15"], correct: 1 },
+            { q: "Какой цвет у лимона?", a: ["Красный", "Желтый", "Зеленый"], correct: 1 },
+            { q: "Сколько месяцев в году?", a: ["10", "12", "14"], correct: 1 },
+            { q: "Что плавает в воде?", a: ["Камень", "Дерево", "Железо"], correct: 1 },
+            { q: "Сколько будет 7 − 3?", a: ["2", "4", "5"], correct: 1 },
+            { q: "Какой праздник отмечают 31 декабря?", a: ["День рождения", "Новый год", "8 марта"], correct: 1 },
+            { q: "Что пьет корова?", a: ["Ягермейстер", "Молоко", "Вода"], correct: 2 }
         ];
 
         let currentQuestions = [];
         let currentIndex = 0;
         let score = 0;
-        const totalToWin = 10;
+        const totalToWin = 10; // Количество вопросов в тесте
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -304,14 +324,16 @@
             resultBox.style.display = 'block';
             resultText.innerText = `Правильных ответов: ${score} из ${currentQuestions.length}`;
 
-            if (score === currentQuestions.length) {
+            // === ЛОГИКА: ПРОМОКОД ТОЛЬКО ПРИ 9 ИЛИ 10 БАЛЛАХ ===
+            if (score >= 9) {
                 resultTitle.innerText = "🎉 АБСОЛЮТНО ТРЕЗВ!";
-                resultTitle.classList.add('success-color');
-                winnerCoupon.style.display = "block";
+                resultTitle.style.color = "#ff69b4"; // Розовый цвет
+                winnerCoupon.style.display = "block"; // ПОКАЗЫВАЕМ ПРОМОКОД
             } else {
-                resultTitle.innerText = "😵 Есть признаки опьянения...";
-                resultTitle.classList.add('fail-color');
-                resultText.innerHTML += "<br>Нужно ответить верно на все вопросы, чтобы получить приз.";
+                resultTitle.innerText = "🍺 ЕСТЬ ПРИЗНАКИ ОПЬЯНЕНИЯ...";
+                resultTitle.style.color = "#aaa"; // Серый цвет
+                resultText.innerHTML += "<br>Упс! Твоя координация подводит. Промокод не выдан.";
+                winnerCoupon.style.display = "none"; // СКРЫВАЕМ ПРОМОКОД
             }
         }
 

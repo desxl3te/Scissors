@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Афиша - Scissors Bar</title>
+    <title>Ladies Night - Scissors Bar</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Playfair+Display:wght@400;700;900&family=WindSong:wght@400;500&display=swap" rel="stylesheet">
@@ -73,7 +73,7 @@
         </ul>
     </aside>
 
-    <!-- === ОСНОВНЫЕ МОДАЛЬНЫЕ ОКНА === -->
+    <!-- === МОДАЛЬНЫЕ ОКНА === -->
     <div id="authModal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
@@ -167,125 +167,27 @@
         </div>
     </div>
 
-    <!-- === КОНТЕНТ АФИШИ (КАРТОЧКИ-КНОПКИ) === -->
-    <main class="events-main-content">
+    <!-- === КОНТЕНТ СТРАНИЦЫ МЕРОПРИЯТИЯ === -->
+    <main class="event-page-main">
         <div class="container">
-            <h2 class="page-title">Афиша мероприятий</h2>
+            <a href="events.html" class="event-back"><i class="fas fa-arrow-left"></i> Вернуться к афише</a>
             
-            <!-- ✅ Карточка 1: Ссылка на event-1.html -->
-            <a href="event-1.html" class="event-card-link">
-                <div class="event-card">
-                    <div class="event-date">
-                        <div class="day">28</div>
-                        <div class="month">Мая</div>
-                    </div>
-                    <div class="event-info">
-                        <span class="event-tag">Вечеринка</span>
-                        <h3>Ladies Night: Розовая Пятница</h3>
-                        <p>Специальная программа для девушек: скидки на коктейли, живая музыка и розыгрыш призов от бара.</p>
-                        <p class="event-time"><i class="fas fa-clock"></i> Начало в 20:00</p>
-                    </div>
-                </div>
-            </a>
+            <img src="images/standup-night.jpg" alt="Stand Up" class="event-hero">
+            <h1 class="event-title">Stand Up Night: Женский взгляд</h1>
+            <div class="event-meta">
+                <span><i class="far fa-calendar"></i> 12 Июня</span>
+                <span><i class="far fa-clock"></i> 20:00</span>
+                <span><i class="fas fa-ticket-alt"></i> 500 ₽</span>
+            </div>
+            <p class="event-host">Ведут комики: <strong> Анна, Мария, Юлия</strong></p>
+            <p class="event-desc">
+                Стендап, который вы запомните надолго. На сцене — только лучшие девушки-комики города, которые не боятся говорить о самом личном, смешном и болезненном. В программе: 4 выступающих, блок импровизаций, интерактив с залом и розыгрыш мерча от бара. Никакой цензуры, только честный юмор и живая энергетика. Формат 18+, поэтому атмосфера будет максимально раскованной. Столы бронируются заранее — в такие вечера зал заполняется за несколько дней. Берите подруг, заказывайте любимые напитки и готовьтесь смеяться до слёз.
+            </p>
+        
 
-            <!-- ✅ Карточка 2: Ссылка на event-2.html -->
-            <a href="event-2.html" class="event-card-link">
-                <div class="event-card">
-                    <div class="event-date">
-                        <div class="day">30</div>
-                        <div class="month">Мая</div>
-                    </div>
-                    <div class="event-info">
-                        <span class="event-tag">Мастер-класс</span>
-                        <h3>Cocktail Masterclass</h3>
-                        <p>Научись готовить фирменные коктейли Scissors Bar под руководством шеф-бармена.</p>
-                        <p class="event-time"><i class="fas fa-clock"></i> Начало в 19:00 | Стоимость: 1500 ₽</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- ✅ Карточка 3: Ссылка на event-3.html -->
-            <a href="event-3.html" class="event-card-link">
-                <div class="event-card">
-                    <div class="event-date">
-                        <div class="day">05</div>
-                        <div class="month">Июня</div>
-                    </div>
-                    <div class="event-info">
-                        <span class="event-tag">Вечеринка</span>
-                        <h3>Start of Summer Party</h3>
-                        <p>Открываем летний сезон громко! DJ set, танцы до утра и летние коктейли по сниженной цене.</p>
-                        <p class="event-time"><i class="fas fa-clock"></i> Начало в 22:00</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- ✅ Карточка 4: Ссылка на event-4.html -->
-            <a href="event-4.html" class="event-card-link">
-                <div class="event-card">
-                    <div class="event-date">
-                        <div class="day">12</div>
-                        <div class="month">Июня</div>
-                    </div>
-                    <div class="event-info">
-                        <span class="event-tag">Стендап</span>
-                        <h3>Stand Up Night: Женский взгляд</h3>
-                        <p>Вечер юмора с лучшими девушками-комиксами города. Смех, шутки и отличное настроение.</p>
-                        <p class="event-time"><i class="fas fa-clock"></i> Начало в 20:00</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- ✅ Карточка 5: Ссылка на event-5.html -->
-            <a href="event-5.html" class="event-card-link">
-                <div class="event-card">
-                    <div class="event-date">
-                        <div class="day">19</div>
-                        <div class="month">Июня</div>
-                    </div>
-                    <div class="event-info">
-                        <span class="event-tag">Концерт</span>
-                        <h3>Rock Covers Live</h3>
-                        <p>Кавер-группа "Pink Noise" исполнит хиты рок-сцены в женском вокале.</p>
-                        <p class="event-time"><i class="fas fa-clock"></i> Начало в 21:00</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- ✅ Карточка 6: Ссылка на event-6.html -->
-            <a href="event-6.html" class="event-card-link">
-                <div class="event-card">
-                    <div class="event-date">
-                        <div class="day">26</div>
-                        <div class="month">Июня</div>
-                    </div>
-                    <div class="event-info">
-                        <span class="event-tag">Закрытая вечеринка</span>
-                        <h3>Scissors Secret Party</h3>
-                        <p>Закрытое мероприятие для своих. Вход только по спискам или брони столика.</p>
-                        <p class="event-time"><i class="fas fa-clock"></i> Начало в 23:00</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- ✅ Карточка 7: Ссылка на event-7.html -->
-            <a href="event-7.html" class="event-card-link">
-                <div class="event-card">
-                    <div class="event-date">
-                        <div class="day">30</div>
-                        <div class="month">Июня</div>
-                    </div>
-                    <div class="event-info">
-                        <span class="event-tag">Финал месяца</span>
-                        <h3>Hello July: Прощай, Июнь!</h3>
-                        <p>Грандиозная вечеринка в честь конца месяца. Подводим итоги и встречаем июль ярко!</p>
-                        <p class="event-time"><i class="fas fa-clock"></i> Начало в 20:00</p>
-                    </div>
-                </div>
-            </a>
-
+            <a href="https://t.me/scissorsbar" target="_blank" class="event-book">Забронировать столик</a>
         </div>
-    </main>  
+    </main>
 
     <!-- === ОКНО УВЕДОМЛЕНИЯ "СПАСИБО" === -->
     <div id="thankYouModal" class="modal thank-you-modal">

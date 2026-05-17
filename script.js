@@ -1,3 +1,72 @@
+/* === ПЛАВНОЕ МЕРЦАНИЕ БЛЁСТОК === */
+document.addEventListener('DOMContentLoaded', () => {
+    const logo = document.querySelector('.hero h1');
+    const container = document.getElementById('sparkles-container');
+    
+    if (!logo || !container || typeof anime === 'undefined') return;
+
+    function createSparkle() {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        
+        const logoRect = logo.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        
+        // Случайная позиция вокруг логотипа (без выхода за границы)
+        const offsetX = (Math.random() - 0.5) * logoRect.width * 1.4;
+        const offsetY = (Math.random() - 0.5) * logoRect.height * 1.4;
+        
+        const centerX = logoRect.left - containerRect.left + logoRect.width / 2;
+        const centerY = logoRect.top - containerRect.top + logoRect.height / 2;
+        
+        sparkle.style.left = `${centerX + offsetX}px`;
+        sparkle.style.top = `${centerY + offsetY}px`;
+        
+        // Случайный размер
+        const size = 4 + Math.random() * 7;
+        sparkle.style.width = `${size}px`;
+        sparkle.style.height = `${size}px`;
+        
+        container.appendChild(sparkle);
+        
+        // Плавное мерцание на месте (без движения и вращения)
+        anime({
+            targets: sparkle,
+            opacity: [
+                { value: 0, duration: 300 },
+                { value: 0.85, duration: 800 },
+                { value: 0.3, duration: 500 },
+                { value: 1, duration: 800 },
+                { value: 0, duration: 600 }
+            ],
+            scale: [
+                { value: 0.6, duration: 300 },
+                { value: 1.15, duration: 800 },
+                { value: 0.85, duration: 500 },
+                { value: 1.2, duration: 800 },
+                { value: 0.6, duration: 600 }
+            ],
+            delay: Math.random() * 1500, // Разный старт, чтобы не мигали синхронно
+            easing: 'easeInOutSine',
+            complete: () => {
+                if (sparkle.parentNode) sparkle.parentNode.removeChild(sparkle);
+            }
+        });
+    }
+
+    // Создаём новые блёстки каждые 400мс
+    const sparkleInterval = setInterval(createSparkle, 400);
+
+    // Стартовая пачка для красивого входа
+    for (let i = 0; i < 6; i++) {
+        setTimeout(createSparkle, i * 200);
+    }
+
+    // Экономия ресурсов при уходе со вкладки
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) clearInterval(sparkleInterval);
+    });
+});
 // Бургер меню
 const burgerBtn = document.getElementById('burgerBtn');
 const sidePanel = document.getElementById('sidePanel');
@@ -413,3 +482,69 @@ logoutBtn.addEventListener('click', (e) => {
 });
 
 updateUI();
+
+/* === ФОНОВЫЕ БЛЕСТКИ ВОКРУГ КАРТОЧКИ === */
+(function() {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSafeSparkles);
+    } else {
+        initSafeSparkles();
+    }
+
+    function initSafeSparkles() {
+        const container = document.getElementById('sparkles-container');
+        const card = document.querySelector('.test-container');
+        
+        // Безопасный выход, если элементов нет
+        if (!container || !card || typeof anime === 'undefined') return;
+
+        // Получаем точные координаты карточки
+        const rect = card.getBoundingClientRect();
+        const buffer = 40; // Отступ от краёв карточки (чтобы не касались)
+        const count = 50;  // Количество блёсток
+
+        for (let i = 0; i < count; i++) {
+            let x, y;
+            // Генерируем координаты, пока они не окажутся ЗА пределами карточки
+            do {
+                x = Math.random() * window.innerWidth;
+                y = Math.random() * window.innerHeight;
+            } while (
+                x > rect.left - buffer && x < rect.right + buffer &&
+                y > rect.top - buffer && y < rect.bottom + buffer
+            );
+
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = `${x}px`;
+            sparkle.style.top = `${y}px`;
+            
+            // Случайный размер для живости
+            const size = 4 + Math.random() * 8;
+            sparkle.style.width = `${size}px`;
+            sparkle.style.height = `${size}px`;
+            
+            container.appendChild(sparkle);
+        }
+
+        // Плавное мерцание на месте (без движения!)
+        anime({
+            targets: '#sparkles-container .sparkle',
+            opacity: [
+                { value: 0, duration: 500 },
+                { value: 0.9, duration: 1500 },
+                { value: 0, duration: 500 }
+            ],
+            scale: [
+                { value: 0.5, duration: 500 },
+                { value: 1.3, duration: 1500 },
+                { value: 0.5, duration: 500 }
+            ],
+            duration: () => anime.random(3000, 6000),
+            delay: () => anime.random(0, 3000),
+            easing: 'easeInOutSine',
+            loop: true,
+            direction: 'alternate'
+        });
+    }
+})();
