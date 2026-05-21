@@ -103,8 +103,32 @@ CREATE TABLE reservations (
     UNIQUE KEY unique_reservation (table_id, reservation_time)
 );
 
+-- афиша мероприятий
+CREATE TABLE events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_date DATE NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    event_type ENUM('Вечеринка', 'Мастер-класс', 'Стендап', 'Концерт', 'Закрытая вечеринка', 'Финал месяца') NOT NULL,
+    description TEXT NOT NULL,
+    start_time TIME NOT NULL,
+    price DECIMAL(10,2) DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    image_url VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- добавление мероприятий из афиши
+INSERT INTO events (event_date, title, event_type, description, start_time, price) VALUES
+('2025-05-28', 'Ladies Night: Розовая Пятница', 'Вечеринка', 'Специальная программа для девушек: скидки на коктейли, живая музыка и розыгрыш призов от бара.', '20:00:00', 0),
+('2025-05-30', 'Cocktail Masterclass', 'Мастер-класс', 'Научись готовить фирменные коктейли Scissors Bar под руководством шеф-бармена.', '19:00:00', 1500),
+('2025-06-05', 'Start of Summer Party', 'Вечеринка', 'Открываем летний сезон громко! Dg set танцы до утра и летние коктейли по сниженной цене.', '22:00:00', 0),
+('2025-06-12', 'Stand Up Night: Женский взгляд', 'Стендап', 'Вечер юмора с лучшими девушками-комиксами города. Смех, шутки и отличное настроение.', '20:00:00', 0),
+('2025-06-19', 'Rock Covers Live', 'Концерт', 'Кавер-группа "Pink Noise" исполнит хиты рок-сцены в женском вокале.', '21:00:00', 0),
+('2025-06-26', 'Scissors Secret Party', 'Закрытая вечеринка', 'Закрытое мероприятие для своих. Вход только по спискам или брони столика.', '23:00:00', 0),
+('2025-06-30', 'Hello July: Прощай, Июнь!', 'Финал месяца', 'Грандиозная вечеринка в честь конца месяца. Подводим итоги и встречаем июль ярко!', '20:00:00', 0);
 -- аля проверка 
 SELECT * FROM categories;
+SELECT * FROM events;
 SELECT id, name, category_id, is_secret, price FROM menu_items LIMIT 5;
 SELECT id, name, price FROM menu_items WHERE is_secret = TRUE;
 SELECT * FROM tables;
