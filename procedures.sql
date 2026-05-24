@@ -7,6 +7,7 @@ DELIMITER //
 CREATE PROCEDURE BookTable(
     IN p_table_id INT,
     IN p_user_id INT,
+    IN p_event_id INT,
     IN p_reservation_time DATETIME,
     IN p_guests_count INT
 )
@@ -32,8 +33,8 @@ BEGIN
     END IF;
 
     -- добавление брони
-    INSERT INTO reservations (table_id, user_id, reservation_time, guests_count, status)
-    VALUES (p_table_id, p_user_id, p_reservation_time, p_guests_count, 'confirmed');
+    INSERT INTO reservations (table_id, user_id, event_id, reservation_time, guests_count, status)
+    VALUES (p_table_id, p_user_id, p_event_id, p_reservation_time, p_guests_count, 'confirmed');
     
     -- возврат ID созданной брони
     SELECT LAST_INSERT_ID() AS new_reservation_id;
