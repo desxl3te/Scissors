@@ -86,23 +86,6 @@ CREATE TABLE users (
 INSERT INTO users (user_name, password_hash, email, phone, role) VALUES
 ('admin', SHA2('admin', 256), 'admin@scissors.bar', '+1234567890', 'admin');
 
--- брони
-CREATE TABLE reservations (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    table_id INT NOT NULL,
-    user_id INT NOT NULL,
-    reservation_time DATETIME NOT NULL,
-    duration_hours INT DEFAULT 2 CHECK (duration_hours BETWEEN 1 AND 4),
-    guests_count INT NOT NULL CHECK (guests_count > 0),
-    status ENUM('confirmed', 'cancelled', 'completed') DEFAULT 'confirmed',
-    special_request TEXT,
-    
-    FOREIGN KEY (table_id) REFERENCES tables(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    
-    UNIQUE KEY unique_reservation (table_id, reservation_time)
-);
-
 -- афиша мероприятий
 CREATE TABLE events (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -115,6 +98,25 @@ CREATE TABLE events (
     is_active BOOLEAN DEFAULT TRUE,
     image_url VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- брони
+CREATE TABLE reservations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    table_id INT NOT NULL,
+    user_id INT NOT NULL,
+    event_id INT NULL,
+    reservation_time DATETIME NOT NULL,
+    duration_hours INT DEFAULT 2 CHECK (duration_hours BETWEEN 1 AND 4),
+    guests_count INT NOT NULL CHECK (guests_count > 0),
+    status ENUM('confirmed', 'cancelled', 'completed') DEFAULT 'confirmed',
+    special_request TEXT,
+    
+    FOREIGN KEY (table_id) REFERENCES tables(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE SET NULL,
+    
+    UNIQUE KEY unique_reservation (table_id, reservation_time)
 );
 
 -- добавление мероприятий из афиши
