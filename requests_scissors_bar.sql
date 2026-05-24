@@ -13,7 +13,7 @@ SELECT * FROM tables;
 SELECT * FROM tables 
 WHERE id NOT IN (
     SELECT table_id FROM reservations 
-    WHERE reservation_time = '2025-04-15 19:00:00'
+    WHERE reservation_time = '2026-04-15 19:00:00'
       AND status = 'confirmed'
 );
 
@@ -22,4 +22,4 @@ SELECT * FROM reservations WHERE user_id = 1;
 
 -- проверка столика 3 на 20:00
 SELECT * FROM reservations 
-WHERE table_id = 3 AND reservation_time = '2025-04-15 20:00:00';
+WHERE table_id = 3 AND reservation_time = '2026-04-15 20:00:00';
