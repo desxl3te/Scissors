@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Playfair+Display:wght@400;700;900&family=WindSong:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="styles1.css">
+    <link rel="stylesheet" href="styles1.css?v=20260522">
     <!-- ✅ Подключение Anime.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 </head>
@@ -22,8 +22,9 @@
                     <ul>
                         <li><a href="#home">Главная</a></li>
                         <li><a href="#about">О нас</a></li>
-                        <!-- ✅ Ссылка на PDF -->
+                        <li><a href="#booking">Бронь</a></li>
                         <li><a href="menu.pdf" target="_blank" rel="noopener noreferrer">Меню</a></li>
+                        <li><a href="dashboard.html">Дашборд</a></li>
                         <li><a href="#contact">Контакты</a></li>
                     </ul>
                 </nav>
@@ -71,7 +72,9 @@
         <div class="close-btn" id="closeBtn">&times;</div> 
         <ul>
             <li><a href="#home">Главная</a></li>
+            <li><a href="#booking">Бронирование</a></li>
             <li><a href="events.html">Расписание мероприятий</a></li>
+            <li><a href="dashboard.html">Дашборды</a></li>
             <li><a href="alco-test.html">Алкотестер</a></li>
         </ul>
     </aside>
@@ -143,9 +146,9 @@
                                 <input type="text" id="editName" placeholder="Ваше имя" required>
                             </div>
                             <div class="form-group">
-                                <label for="editAvatar">Аватарка</label>
-                                <input type="file" id="editAvatar" accept="image/*">
-                                <small class="form-hint">Выберите файл, чтобы обновить фото.</small>
+                                <label for="editPhone">Телефон</label>
+                                <input type="tel" id="editPhone" placeholder="+7 (999) 123-45-67">
+                                <small class="form-hint">Номер для связи по бронированию.</small>
                             </div>
                             <button type="submit" class="btn">Сохранить изменения</button>
                         </form>
@@ -156,7 +159,7 @@
                 <div id="supportTab" class="tab-content">
                     <div class="auth-container">
                         <h2 class="modal-title">Поддержка</h2>
-                        <form action="https://formspree.io/f/xykoeyeo" method="POST" id="supportForm">
+                        <form id="supportForm">
                             <div class="form-group">
                                 <label for="supportName">Ваше имя</label>
                                 <input type="text" name="name" id="supportName" placeholder="Ваше имя" required>
@@ -182,7 +185,10 @@
                 
                 <h1>Scissors</h1>
                 <p>Острые впечатления. Смелые коктейли. Ночь в твоем вкусе.</p>
-                <a href="menu.pdf" target="_blank" rel="noopener noreferrer" class="btn">Смотреть меню</a>
+                <div class="hero-actions">
+                    <a href="menu.pdf" target="_blank" rel="noopener noreferrer" class="btn">Смотреть меню</a>
+                    <a href="#booking" class="btn btn-ghost">Забронировать</a>
+                </div>
             </div>
         </section>
 
@@ -198,6 +204,99 @@
                     </div>
                     <div class="about-image">
                         <img src="images/inside%20bar.png" alt="Интерьер бара Scissors">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="booking" class="booking">
+            <div class="container">
+                <div class="booking-shell">
+                    <div class="booking-copy">
+                        <p class="booking-kicker">Онлайн-бронирование</p>
+                        <h2>Бронь столика без лишних окон</h2>
+                        <p class="booking-lead">
+                            Выбери дату, количество гостей и сразу получи свободные столики из базы.
+                            После входа в аккаунт здесь же появятся твои текущие брони.
+                        </p>
+                        <div class="booking-facts">
+                            <div class="booking-fact">
+                                <strong>1-4 часа</strong>
+                                <span>длительность брони</span>
+                            </div>
+                            <div class="booking-fact">
+                                <strong>До 12 гостей</strong>
+                                <span>под один заказ</span>
+                            </div>
+                            <div class="booking-fact">
+                                <strong>Мгновенно</strong>
+                                <span>проверка доступности</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="booking-panel">
+                        <div class="booking-card">
+                            <h3>Новая бронь</h3>
+                            <form id="bookingForm" class="booking-form">
+                                <div class="booking-grid">
+                                    <div class="form-group">
+                                        <label for="reservationDateTime">Дата и время</label>
+                                        <input type="datetime-local" id="reservationDateTime" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="reservationGuests">Гости</label>
+                                        <select id="reservationGuests" required>
+                                            <option value="1">1 гость</option>
+                                            <option value="2" selected>2 гостя</option>
+                                            <option value="3">3 гостя</option>
+                                            <option value="4">4 гостя</option>
+                                            <option value="5">5 гостей</option>
+                                            <option value="6">6 гостей</option>
+                                            <option value="8">8 гостей</option>
+                                            <option value="10">10 гостей</option>
+                                            <option value="12">12 гостей</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="reservationDuration">Длительность</label>
+                                        <select id="reservationDuration" required>
+                                            <option value="1">1 час</option>
+                                            <option value="2" selected>2 часа</option>
+                                            <option value="3">3 часа</option>
+                                            <option value="4">4 часа</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tableSelect">Столик</label>
+                                        <select id="tableSelect" required>
+                                            <option value="">Сначала выбери дату и время</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="specialRequest">Пожелания</label>
+                                    <textarea id="specialRequest" rows="3" placeholder="Например: столик у стены или поздравление для подруги"></textarea>
+                                </div>
+
+                                <p id="bookingStatus" class="form-status booking-status"></p>
+                                <button type="submit" class="btn btn-full">Забронировать</button>
+                            </form>
+                        </div>
+
+                        <div class="booking-card booking-history">
+                            <div class="booking-history-header">
+                                <div>
+                                    <h3>Мои брони</h3>
+                                    <p>Список загружается из базы после входа.</p>
+                                </div>
+                                <button id="refreshReservationsBtn" type="button" class="btn btn-small">Обновить</button>
+                            </div>
+                            <div id="reservationList" class="reservation-list">
+                                <p class="reservation-empty">Войди в аккаунт, чтобы видеть свои брони.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -221,7 +320,7 @@
                         <i class="fas fa-phone-alt"></i>
                         <h3>Телефон</h3>
                         <p>+7 (999) 123-45-67</p>
-                        <p>(Бронь по телефону)</p>
+                        <p>(Онлайн-бронь и связь с баром)</p>
                     </div>
                 </div>
                 <div class="social-links">
@@ -246,7 +345,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
-    <script src='//app.restoplace.cc/widget.js?h=6b49d64843a2ce63d2bb' async></script>
+    <script src="js/api.js?v=20260522"></script>
+    <script src="js/site.js?v=20260522"></script>
 </body>
 </html>
