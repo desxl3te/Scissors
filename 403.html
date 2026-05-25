@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 — Доступ запрещен | Scissors Bar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles1.css">
+    <link rel="stylesheet" href="css/errors.css">
+</head>
+<body>
+    <main class="error-page">
+        <div class="error-container">
+            <div class="error-icon"><i class="fas fa-lock"></i></div>
+            <h1 class="error-code">403</h1>
+            <h2 class="error-title">Доступ запрещен</h2>
+            <p class="error-message">
+                У этой страницы ограниченный доступ. Чаще всего помогает вход в аккаунт
+                или возврат на главную страницу проекта.
+            </p>
+            <div class="error-hint">
+                <strong>Что сделать:</strong><br>
+                Войдите в аккаунт, проверьте ссылку или откройте раздел контактов.
+            </div>
+            <div class="error-actions">
+                <a href="index.html" class="error-btn">
+                    <i class="fas fa-home"></i> На главную
+                </a>
+                <a href="index.html#contact" class="error-btn secondary">
+                    <i class="fas fa-headset"></i> Поддержка
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="js/errors.js"></script>
+</body>
+</html>

@@ -1,0 +1,334 @@
+/* === ОСНОВНАЯ СТРУКТУРА === */
+.booking-main {
+    padding-top: 120px;
+    min-height: 100vh;
+    background: #0a0a0f;
+    padding-bottom: 60px;
+}
+
+.booking-subtitle {
+    color: #888;
+    margin: -10px 0 40px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.booking-form {
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(20, 20, 20, 0.85);
+    border: 1px solid rgba(255, 105, 180, 0.2);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+/* === ГРУППА ПОЛЕЙ === */
+.form-group {
+    margin-bottom: 20px;
+    position: relative; /* База для позиционирования стрелки */
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    font-family: 'Playfair Display', serif;
+}
+
+/* === ОБЩИЕ СТИЛИ ДЛЯ ВСЕХ ПОЛЕЙ === */
+.form-group input,
+.form-group textarea,
+.form-group select,
+.custom-select-trigger {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(10, 10, 10, 0.8);
+    border: 1px solid rgba(255, 105, 180, 0.3);
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    transition: 0.3s;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus,
+.custom-select-trigger:hover {
+    outline: none;
+    border-color: #ff69b4;
+    box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+    padding-right: 16px;
+}
+
+/* === НАСТРОЙКА ВЫПАДАЮЩИХ СПИСКОВ === */
+.form-group select {
+    /* Полностью убираем стандартную стрелку браузера */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    padding-right: 45px; /* Место справа для нашей стрелки */
+}
+
+/* === НАШИ РОЗОВЫЕ СТРЕЛКИ === */
+/* Скрываем старые иконки */
+.custom-select-trigger i { display: none !important; }
+
+/* Контейнер стрелки */
+.form-group .arrow {
+    position: absolute;
+    right: 16px;
+    top: 46px; /* ОПУЩЕНО ВНИЗ (в центр поля) */
+    width: 20px;
+    height: 20px;
+    pointer-events: none; /* Пропускает клики сквозь себя */
+    z-index: 2;
+}
+
+/* Сама иконка */
+.form-group .arrow::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff69b4'%3E%3Cpath d='M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    
+    /* ПЛАВНОСТЬ ВРАЩЕНИЯ */
+    transition: transform 0.3s ease;
+    transform: rotate(0deg);
+}
+
+/* Показываем стрелку только там, где нужно */
+.form-group .arrow { opacity: 0; }
+.form-group:has(select) .arrow,
+.form-group:has(.custom-select) .arrow { opacity: 1; }
+
+/* === ЛОГИКА ВРАЩЕНИЯ === */
+/* 1. Когда фокус на обычном select */
+.form-group select:focus ~ .arrow::before {
+    transform: rotate(180deg);
+}
+
+/* 2. Когда открыта кастомная дата */
+.form-group .custom-select.open ~ .arrow::before {
+    transform: rotate(180deg);
+}
+/* ПРИМЕЧАНИЕ: Когда фокус уходит (список закрывается), 
+   transform автоматически возвращается в 0deg благодаря transition */
+
+
+/* === КАСТОМНАЯ ДАТА (ВЫПАДАЮЩИЙ СПИСОК) === */
+.custom-select {
+    position: relative;
+    width: 100%;
+}
+
+.custom-select-trigger {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.3s;
+}
+
+.custom-select.open .custom-select-trigger {
+    border-color: #ff69b4;
+}
+
+.custom-select-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #111;
+    border: 1px solid rgba(255, 105, 180, 0.3);
+    border-radius: 10px;
+    margin-top: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    z-index: 100;
+}
+
+.custom-select.open .custom-select-options {
+    display: block;
+}
+
+.date-option {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 105, 180, 0.1);
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    justify-content: space-between;
+}
+
+.date-option:hover:not(.disabled) {
+    background: rgba(255, 105, 180, 0.1);
+}
+
+.date-option.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    color: #666;
+}
+
+.date-option-slots {
+    font-size: 0.85rem;
+    color: #4caf50;
+}
+
+.date-option.disabled .date-option-slots {
+    color: #f44336;
+}
+
+/* === СЛОТЫ ВРЕМЕНИ === */
+.time-slots {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.time-slot {
+    padding: 12px;
+    background: rgba(10, 10, 10, 0.8);
+    border: 2px solid rgba(255, 105, 180, 0.3);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.time-slot:hover:not(.booked) {
+    border-color: #ff69b4;
+    background: rgba(255, 105, 180, 0.1);
+    transform: translateY(-2px);
+}
+
+.time-slot.selected {
+    background: #ff69b4;
+    color: #000;
+    border-color: #ff69b4;
+    font-weight: 700;
+}
+
+.time-slot.booked {
+    background: rgba(60, 60, 60, 0.4);
+    border-color: rgba(60, 60, 60, 0.4);
+    color: #555;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+.time-slot.loading {
+    opacity: 0.5;
+    cursor: wait;
+    pointer-events: none;
+}
+
+/* === ИНФО И КНОПКИ === */
+.field-info {
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: #777;
+}
+.field-info.success { color: #4caf50; }
+.field-info.error { color: #f44336; }
+
+.form-actions {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.btn-large {
+    padding: 16px 50px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    background: #ff69b4;
+    color: #000;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    transition: 0.3s;
+    font-family: 'Playfair Display', serif;
+}
+
+.btn-large:hover {
+    background: #ff85c3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+}
+
+/* === МОДАЛЬНОЕ ОКНО === */
+.booking-modal {
+    max-width: 500px;
+    text-align: center;
+    padding: 40px;
+    background: #111;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 105, 180, 0.2);
+}
+
+.modal-header i {
+    font-size: 4rem;
+    color: #4caf50;
+    margin-bottom: 15px;
+}
+
+.booking-details {
+    background: rgba(255, 105, 180, 0.1);
+    border: 1px solid rgba(255, 105, 180, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.booking-details p {
+    margin: 8px 0;
+    color: #fff;
+    font-size: 0.95rem;
+}
+
+.booking-details strong {
+    color: #ff69b4;
+}
+
+/* === АДАПТИВ === */
+@media (max-width: 768px) {
+    .booking-main { padding-top: 100px; }
+    .form-row { grid-template-columns: 1fr; gap: 15px; }
+    .booking-form { padding: 25px; }
+    .btn-large { width: 100%; padding: 16px; }
+    .time-slots { grid-template-columns: repeat(3, 1fr); }
+}

@@ -1,0 +1,109 @@
+/* === СТРАНИЦЫ ОШИБОК === */
+.error-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--black);
+    padding: 20px;
+    text-align: center;
+}
+
+.error-container {
+    max-width: 600px;
+    padding: 40px 20px;
+}
+
+.error-code {
+    font-family: 'Playfair Display', serif;
+    font-size: 8rem;
+    font-weight: 900;
+    color: var(--pink);
+    line-height: 1;
+    margin-bottom: 20px;
+    text-shadow: 0 0 30px rgba(255, 105, 180, 0.5);
+    animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(0.98); }
+}
+
+.error-title {
+    font-size: 2rem;
+    color: var(--white);
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.error-message {
+    color: #aaa;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 30px;
+}
+
+.error-hint {
+    background: rgba(255, 105, 180, 0.1);
+    border-left: 3px solid var(--pink);
+    padding: 15px 20px;
+    margin: 25px 0;
+    text-align: left;
+    border-radius: 0 10px 10px 0;
+    color: #ccc;
+    font-size: 0.95rem;
+}
+
+.error-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.error-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 25px;
+    background: var(--pink);
+    color: var(--black);
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: 0.3s;
+    border: 2px solid var(--pink);
+}
+
+.error-btn:hover {
+    background: transparent;
+    color: var(--pink);
+    transform: translateY(-2px);
+}
+
+.error-btn.secondary {
+    background: transparent;
+    color: var(--pink);
+    border: 2px solid var(--pink);
+}
+
+.error-btn.secondary:hover {
+    background: var(--pink);
+    color: var(--black);
+}
+
+.error-icon {
+    font-size: 4rem;
+    color: var(--pink);
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .error-code { font-size: 5rem; }
+    .error-title { font-size: 1.5rem; }
+    .error-actions { flex-direction: column; }
+    .error-btn { width: 100%; justify-content: center; }
+}

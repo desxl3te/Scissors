@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 — Ошибка сервера | Scissors Bar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles1.css">
+    <link rel="stylesheet" href="css/errors.css">
+</head>
+<body>
+    <main class="error-page">
+        <div class="error-container">
+            <div class="error-icon"><i class="fas fa-bolt"></i></div>
+            <h1 class="error-code">500</h1>
+            <h2 class="error-title">Что-то пошло не так</h2>
+            <p class="error-message">
+                Внутри сервиса произошла ошибка. Обычно помогает обновление страницы
+                или повторный запуск backend и dashboard.
+            </p>
+            <div class="error-hint">
+                <strong>Попробуйте:</strong><br>
+                Перезапустить FastAPI, затем Flask dashboard и только после этого обновить страницу.
+            </div>
+            <div class="error-actions">
+                <a href="index.html" class="error-btn">
+                    <i class="fas fa-redo"></i> На главную
+                </a>
+                <a href="index.html#contact" class="error-btn secondary">
+                    <i class="fas fa-envelope"></i> Контакты
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="js/errors.js"></script>
+</body>
+</html>

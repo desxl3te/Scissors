@@ -1,604 +1,242 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const api = window.ScissorsApi;
-    const session = api.getSession();
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дашборды - Scissors Bar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Playfair+Display:wght@400;700;900&family=WindSong:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles1.css?v=20260522">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">Scissors<span>Bar</span></a>
+            <div class="nav-right-group">
+                <nav>
+                    <ul>
+                        <li><a href="index.html#home">Главная</a></li>
+                        <li><a href="index.html#about">О нас</a></li>
+                        <li><a href="menu.pdf" target="_blank" rel="noopener noreferrer">Меню</a></li>
+                        <li><a href="index.html#contact">Контакты</a></li>
+                    </ul>
+                </nav>
 
-    const burgerBtn = document.getElementById('burgerBtn');
-    const sidePanel = document.getElementById('sidePanel');
-    const overlay = document.getElementById('overlay');
-    const closeBtn = document.getElementById('closeBtn');
-    const panelLinks = document.querySelectorAll('.side-panel a');
+                <div class="user-account-wrapper">
+                    <button id="userAccountBtn" class="user-account-btn" aria-label="Аккаунт">
+                        <i class="fas fa-user"></i>
+                    </button>
 
-    const authModal = document.getElementById('authModal');
-    const closeModalBtn = document.querySelector('.close-modal');
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+                    <div class="user-dropdown-menu" id="userDropdownMenu">
+                        <div id="loggedOutView">
+                            <a href="#" class="dropdown-link"><i class="fas fa-sign-in-alt"></i> Войти / Регистрация</a>
+                        </div>
 
-    const userAccountBtn = document.getElementById('userAccountBtn');
-    const userDropdownMenu = document.getElementById('userDropdownMenu');
-    const loggedOutView = document.getElementById('loggedOutView');
-    const loggedInView = document.getElementById('loggedInView');
-    const userNameDisplay = document.getElementById('userNameDisplay');
-    const userAvatarWrapper = document.getElementById('userAvatarWrapper');
-
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const editProfileForm = document.getElementById('editProfileForm');
-    const supportForm = document.getElementById('supportForm');
-
-    const switchToRegister = document.getElementById('switchToRegister');
-    const switchToLogin = document.getElementById('switchToLogin');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const editProfileLink = document.getElementById('editProfileLink');
-    const supportLink = document.getElementById('supportLink');
-
-    const editNameInput = document.getElementById('editName');
-    const editPhoneInput = document.getElementById('editPhone');
-
-    const thankYouModal = document.getElementById('thankYouModal');
-    const thankYouOkBtn = document.getElementById('thankYouOkBtn');
-
-    const bookingForm = document.getElementById('bookingForm');
-    const reservationDateTime = document.getElementById('reservationDateTime');
-    const reservationGuests = document.getElementById('reservationGuests');
-    const reservationDuration = document.getElementById('reservationDuration');
-    const tableSelect = document.getElementById('tableSelect');
-    const specialRequest = document.getElementById('specialRequest');
-    const bookingStatus = document.getElementById('bookingStatus');
-    const reservationList = document.getElementById('reservationList');
-    const refreshReservationsBtn = document.getElementById('refreshReservationsBtn');
-
-    function toggleMenu() {
-        if (!burgerBtn || !sidePanel || !overlay) return;
-
-        burgerBtn.classList.toggle('active');
-        sidePanel.classList.toggle('active');
-        overlay.classList.toggle('active');
-        document.body.style.overflow = sidePanel.classList.contains('active') ? 'hidden' : '';
-    }
-
-    function activateTab(tabName) {
-        tabBtns.forEach((btn) => {
-            btn.classList.toggle('active', btn.dataset.tab === tabName);
-        });
-
-        tabContents.forEach((content) => {
-            content.classList.toggle('active', content.id === `${tabName}Tab`);
-        });
-    }
-
-    function openAuthModal(tabName = 'login') {
-        if (!authModal) return;
-        authModal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-
-        if (tabName === 'support' && supportForm && isLoggedIn()) {
-            const user = currentUser();
-            const nameInput = supportForm.querySelector('#supportName');
-            const emailInput = supportForm.querySelector('#supportEmail');
-
-            if (nameInput && !nameInput.value) nameInput.value = user.user_name || '';
-            if (emailInput && !emailInput.value) emailInput.value = user.email || '';
-        }
-
-        activateTab(tabName);
-    }
-
-    function closeAuthModal() {
-        if (!authModal) return;
-        authModal.style.display = 'none';
-        document.body.style.overflow = '';
-    }
-
-    function currentUser() {
-        return session.user || null;
-    }
-
-    function isLoggedIn() {
-        return Boolean(session.token && session.user);
-    }
-
-    function persistSession(payload) {
-        session.token = payload.access_token;
-        session.user = payload.user;
-        api.saveSession({ token: session.token, user: session.user });
-        renderUserState();
-    }
-
-    function clearSession() {
-        session.token = null;
-        session.user = null;
-        api.clearSession();
-        renderUserState();
-        renderReservations([]);
-    }
-
-    function setFormMessage(target, message, isError = false) {
-        if (!target) return;
-        target.textContent = message || '';
-        target.classList.toggle('is-error', isError);
-        target.classList.toggle('is-success', Boolean(message) && !isError);
-    }
-
-    function upsertFormStatus(form) {
-        if (!form) return null;
-
-        let status = form.querySelector('.form-status');
-        if (!status) {
-            status = document.createElement('p');
-            status.className = 'form-status';
-            form.appendChild(status);
-        }
-        return status;
-    }
-
-    function setSubmitState(form, busy, text) {
-        if (!form) return;
-        const submitButton = form.querySelector('button[type="submit"]');
-        if (!submitButton) return;
-
-        if (!submitButton.dataset.defaultText) {
-            submitButton.dataset.defaultText = submitButton.textContent;
-        }
-
-        submitButton.disabled = busy;
-        submitButton.textContent = busy ? text : submitButton.dataset.defaultText;
-    }
-
-    function renderUserState() {
-        const user = currentUser();
-
-        if (loggedOutView) {
-            loggedOutView.style.display = user ? 'none' : 'block';
-        }
-
-        if (loggedInView) {
-            loggedInView.style.display = user ? 'block' : 'none';
-        }
-
-        if (userNameDisplay) {
-            userNameDisplay.textContent = user ? user.user_name : 'Гость Бара';
-        }
-
-        if (userAvatarWrapper) {
-            userAvatarWrapper.innerHTML = '<i class="fas fa-user user-avatar-icon"></i>';
-        }
-
-        if (editNameInput) {
-            editNameInput.value = user ? user.user_name : '';
-        }
-
-        if (editPhoneInput) {
-            const hint = editPhoneInput.parentElement ? editPhoneInput.parentElement.querySelector('.form-hint') : null;
-            editPhoneInput.value = user && user.phone ? user.phone : '';
-            if (hint) hint.textContent = 'Номер для связи по бронированию.';
-        }
-    }
-
-    async function syncProfile() {
-        if (!isLoggedIn()) return;
-
-        try {
-            const response = await api.getProfile();
-            session.user = response.result;
-            api.saveSession({ token: session.token, user: session.user });
-            renderUserState();
-        } catch (error) {
-            clearSession();
-        }
-    }
-
-    async function loadAvailability() {
-        if (!bookingForm || !reservationDateTime || !reservationGuests || !reservationDuration || !tableSelect) {
-            return;
-        }
-
-        const dateValue = reservationDateTime.value;
-        if (!dateValue) {
-            tableSelect.innerHTML = '<option value="">Сначала выбери дату и время</option>';
-            return;
-        }
-
-        setFormMessage(bookingStatus, 'Проверяем свободные столики...');
-
-        try {
-            const response = await api.getAvailability({
-                reservation_time: dateValue,
-                guests_count: reservationGuests.value,
-                duration_hours: reservationDuration.value
-            });
-
-            const availableTables = response.data.filter((item) => item.is_available);
-            if (!availableTables.length) {
-                tableSelect.innerHTML = '<option value="">Свободных столиков нет</option>';
-                setFormMessage(bookingStatus, 'На выбранное время свободных столиков нет.', true);
-                return;
-            }
-
-            tableSelect.innerHTML = availableTables
-                .map((item) => (
-                    `<option value="${item.id}">Столик ${item.table_number} · ${item.seats_count} мест</option>`
-                ))
-                .join('');
-
-            setFormMessage(bookingStatus, `Найдено столиков: ${availableTables.length}`);
-        } catch (error) {
-            tableSelect.innerHTML = '<option value="">Не удалось получить список</option>';
-            setFormMessage(bookingStatus, error.message || 'Не удалось проверить доступность.', true);
-        }
-    }
-
-    function renderReservations(items) {
-        if (!reservationList) return;
-
-        if (!isLoggedIn()) {
-            reservationList.innerHTML = '<p class="reservation-empty">Войди в аккаунт, чтобы видеть свои брони.</p>';
-            return;
-        }
-
-        if (!items.length) {
-            reservationList.innerHTML = '<p class="reservation-empty">Броней пока нет.</p>';
-            return;
-        }
-
-        reservationList.innerHTML = items.map((item) => `
-            <article class="reservation-card">
-                <div>
-                    <h4>Столик ${item.table_number}</h4>
-                    <p>${item.reservation_time}</p>
-                    <p>${item.guests_count} гостей · ${item.duration_hours} ч.</p>
-                    <p>Статус: ${item.status}</p>
+                        <div id="loggedInView" style="display: none;">
+                            <div class="dropdown-header">
+                                <div class="user-avatar-wrapper" id="userAvatarWrapper">
+                                    <i class="fas fa-user user-avatar-icon"></i>
+                                </div>
+                                <div class="user-info">
+                                    <span class="user-name" id="userNameDisplay">Гость Бара</span>
+                                </div>
+                            </div>
+                            <hr class="dropdown-divider">
+                            <a href="index.html#booking" class="dropdown-link"><i class="fas fa-calendar-check"></i> Бронирование</a>
+                            <a href="#" id="editProfileLink" class="dropdown-link"><i class="fas fa-user-edit"></i> Редактировать профиль</a>
+                            <a href="#" id="supportLink" class="dropdown-link"><i class="fas fa-headset"></i> Поддержка</a>
+                            <hr class="dropdown-divider">
+                            <a href="#" id="logoutBtn" class="dropdown-link"><i class="fas fa-sign-out-alt"></i> Выйти из аккаунта</a>
+                        </div>
+                    </div>
                 </div>
-                <button class="btn btn-small reservation-cancel" data-id="${item.id}" ${item.status === 'cancelled' ? 'disabled' : ''}>
-                    ${item.status === 'cancelled' ? 'Отменено' : 'Отменить'}
-                </button>
-            </article>
-        `).join('');
-    }
 
-    async function loadReservations() {
-        if (!reservationList) return;
-        if (!isLoggedIn()) {
-            renderReservations([]);
-            return;
-        }
+                <div class="burger-btn" id="burgerBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
 
-        reservationList.innerHTML = '<p class="reservation-empty">Загружаем брони...</p>';
+    <div class="overlay" id="overlay"></div>
 
-        try {
-            const response = await api.getMyReservations();
-            renderReservations(response.data);
-        } catch (error) {
-            reservationList.innerHTML = `<p class="reservation-empty">${error.message}</p>`;
-        }
-    }
+    <aside class="side-panel" id="sidePanel">
+        <div class="close-btn" id="closeBtn">&times;</div>
+        <ul>
+            <li><a href="index.html#home">Главная</a></li>
+            <li><a href="events.html">Афиша</a></li>
+            <li><a href="alco-test.html">Алкотестер</a></li>
+            <li><a href="about.html">О проекте</a></li>
+            <li><a href="dashboard.html" class="active-link">Дашборды</a></li>
+        </ul>
+    </aside>
 
-    async function handleReservationCancel(event) {
-        const button = event.target.closest('.reservation-cancel');
-        if (!button) return;
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
 
-        try {
-            await api.cancelReservation(button.dataset.id);
-            await loadReservations();
-            setFormMessage(bookingStatus, 'Бронь отменена.');
-        } catch (error) {
-            setFormMessage(bookingStatus, error.message || 'Не удалось отменить бронь.', true);
-        }
-    }
+            <div class="auth-tabs">
+                <button class="tab-btn active" data-tab="login">Вход</button>
+                <button class="tab-btn" data-tab="register">Регистрация</button>
+                <button class="tab-btn" data-tab="editProfile" style="display: none;">Редактировать</button>
+                <button class="tab-btn" data-tab="support" style="display: none;">Поддержка</button>
+            </div>
 
-    function initHeroSparkles() {
-        const logo = document.querySelector('.hero h1');
-        const container = document.getElementById('sparkles-container');
+            <div id="loginTab" class="tab-content active">
+                <div class="auth-container">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" placeholder="your@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Пароль</label>
+                            <input type="password" id="password" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn">ВОЙТИ</button>
+                    </form>
+                    <p class="auth-switch-text">Нет аккаунта? <a href="#" id="switchToRegister">Зарегистрироваться</a></p>
+                </div>
+            </div>
 
-        if (!logo || !container || typeof anime === 'undefined') return;
+            <div id="registerTab" class="tab-content">
+                <div class="auth-container">
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="regName">Имя</label>
+                            <input type="text" id="regName" placeholder="Ваше имя" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regEmail">Email</label>
+                            <input type="email" id="regEmail" placeholder="your@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regPassword">Пароль</label>
+                            <input type="password" id="regPassword" placeholder="••••••••" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regConfirmPassword">Подтвердите пароль</label>
+                            <input type="password" id="regConfirmPassword" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn">ЗАРЕГИСТРИРОВАТЬСЯ</button>
+                    </form>
+                    <p class="auth-switch-text">Уже есть аккаунт? <a href="#" id="switchToLogin">Войти</a></p>
+                </div>
+            </div>
 
-        function createSparkle() {
-            const sparkle = document.createElement('div');
-            sparkle.className = 'sparkle';
+            <div id="editProfileTab" class="tab-content">
+                <div class="auth-container">
+                    <h2 class="modal-title">Редактировать профиль</h2>
+                    <form id="editProfileForm">
+                        <div class="form-group">
+                            <label for="editName">Имя</label>
+                            <input type="text" id="editName" placeholder="Ваше имя" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editPhone">Телефон</label>
+                            <input type="tel" id="editPhone" placeholder="+7 (999) 123-45-67">
+                            <small class="form-hint">Номер для связи по бронированию.</small>
+                        </div>
+                        <button type="submit" class="btn">Сохранить изменения</button>
+                    </form>
+                </div>
+            </div>
 
-            const logoRect = logo.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-            const offsetX = (Math.random() - 0.5) * logoRect.width * 1.4;
-            const offsetY = (Math.random() - 0.5) * logoRect.height * 1.4;
+            <div id="supportTab" class="tab-content">
+                <div class="auth-container">
+                    <h2 class="modal-title">Поддержка</h2>
+                    <form id="supportForm">
+                        <div class="form-group">
+                            <label for="supportName">Ваше имя</label>
+                            <input type="text" name="name" id="supportName" placeholder="Ваше имя" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="supportEmail">Ваш Email</label>
+                            <input type="email" name="email" id="supportEmail" placeholder="your@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="supportMessage">Сообщение</label>
+                            <textarea name="message" id="supportMessage" rows="5" placeholder="Опишите проблему..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-full">Отправить сообщение</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            sparkle.style.left = `${logoRect.left - containerRect.left + logoRect.width / 2 + offsetX}px`;
-            sparkle.style.top = `${logoRect.top - containerRect.top + logoRect.height / 2 + offsetY}px`;
+    <main class="dashboard-main">
+        <section class="dashboard-hero">
+            <div class="container">
+                <p class="booking-kicker">Flask Dashboard Service</p>
+                <h1 class="dashboard-title">Операционная картина бара</h1>
+                <p class="dashboard-subtitle">
+                    Статистика по броням, загрузке дней недели и популярности столиков.
+                    Данные подтягиваются из отдельного Flask-сервиса.
+                </p>
+            </div>
+        </section>
 
-            const size = 4 + Math.random() * 7;
-            sparkle.style.width = `${size}px`;
-            sparkle.style.height = `${size}px`;
-            container.appendChild(sparkle);
+        <section class="dashboard-section">
+            <div class="container">
+                <div class="dashboard-toolbar">
+                    <div>
+                        <h2>Сводка</h2>
+                        <p id="dashboardGeneratedAt" class="dashboard-generated-at">Обновлено: ожидание данных</p>
+                    </div>
+                    <button id="refreshDashboardBtn" type="button" class="btn btn-small">Обновить</button>
+                </div>
 
-            anime({
-                targets: sparkle,
-                opacity: [{ value: 0, duration: 250 }, { value: 1, duration: 700 }, { value: 0, duration: 450 }],
-                scale: [{ value: 0.5, duration: 250 }, { value: 1.15, duration: 700 }, { value: 0.6, duration: 450 }],
-                easing: 'easeInOutSine',
-                complete: () => sparkle.remove()
-            });
-        }
+                <div id="dashboardCards" class="dashboard-cards">
+                    <article class="dashboard-card">
+                        <span>Загрузка</span>
+                        <strong>...</strong>
+                    </article>
+                </div>
 
-        const sparkleInterval = setInterval(createSparkle, 500);
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) clearInterval(sparkleInterval);
-        });
-    }
+                <p id="dashboardStatus" class="form-status dashboard-status">Загружаем дашборд...</p>
 
-    if (burgerBtn) burgerBtn.addEventListener('click', toggleMenu);
-    if (overlay) overlay.addEventListener('click', toggleMenu);
-    if (closeBtn) closeBtn.addEventListener('click', toggleMenu);
-    panelLinks.forEach((link) => link.addEventListener('click', () => {
-        if (sidePanel && sidePanel.classList.contains('active')) toggleMenu();
-    }));
+                <div class="dashboard-grid">
+                    <article class="dashboard-panel">
+                        <h3>Статусы броней</h3>
+                        <canvas id="reservationStatusChart"></canvas>
+                    </article>
 
-    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-        const targetSelector = anchor.getAttribute('href');
-        if (!targetSelector || targetSelector === '#') return;
+                    <article class="dashboard-panel">
+                        <h3>Нагрузка по дням недели</h3>
+                        <canvas id="weekdayLoadChart"></canvas>
+                    </article>
 
-        anchor.addEventListener('click', (event) => {
-            const target = document.querySelector(targetSelector);
-            if (!target) return;
-            event.preventDefault();
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-    });
+                    <article class="dashboard-panel dashboard-panel-wide">
+                        <h3>Популярные столики</h3>
+                        <canvas id="popularTablesChart"></canvas>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
 
-    if (userAccountBtn) {
-        userAccountBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            if (!isLoggedIn()) {
-                openAuthModal('login');
-                return;
-            }
-            if (userDropdownMenu) {
-                userDropdownMenu.classList.toggle('active');
-            }
-        });
-    }
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Scissors Bar. Все права защищены.</p>
+        </div>
+    </footer>
 
-    if (document.querySelector('#loggedOutView .dropdown-link')) {
-        document.querySelector('#loggedOutView .dropdown-link').addEventListener('click', (event) => {
-            event.preventDefault();
-            openAuthModal('login');
-        });
-    }
+    <div id="thankYouModal" class="modal thank-you-modal">
+        <div class="modal-content thank-you-content">
+            <h2 class="modal-title">Спасибо!</h2>
+            <p class="thank-you-text">Ваше сообщение успешно отправлено.</p>
+            <button id="thankYouOkBtn" class="btn btn-full">ОК</button>
+        </div>
+    </div>
 
-    document.addEventListener('click', (event) => {
-        if (!userDropdownMenu || !userAccountBtn) return;
-        if (!userDropdownMenu.contains(event.target) && !userAccountBtn.contains(event.target)) {
-            userDropdownMenu.classList.remove('active');
-        }
-    });
-
-    if (closeModalBtn) closeModalBtn.addEventListener('click', closeAuthModal);
-    window.addEventListener('click', (event) => {
-        if (event.target === authModal) closeAuthModal();
-        if (event.target === thankYouModal) thankYouModal.style.display = 'none';
-    });
-
-    tabBtns.forEach((btn) => {
-        btn.addEventListener('click', () => activateTab(btn.dataset.tab));
-    });
-
-    if (switchToRegister) {
-        switchToRegister.addEventListener('click', (event) => {
-            event.preventDefault();
-            activateTab('register');
-        });
-    }
-
-    if (switchToLogin) {
-        switchToLogin.addEventListener('click', (event) => {
-            event.preventDefault();
-            activateTab('login');
-        });
-    }
-
-    if (editProfileLink) {
-        editProfileLink.addEventListener('click', (event) => {
-            event.preventDefault();
-            openAuthModal('editProfile');
-        });
-    }
-
-    if (supportLink) {
-        supportLink.addEventListener('click', (event) => {
-            event.preventDefault();
-            openAuthModal('support');
-        });
-    }
-
-    if (thankYouOkBtn) {
-        thankYouOkBtn.addEventListener('click', () => {
-            if (thankYouModal) thankYouModal.style.display = 'none';
-        });
-    }
-
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const status = upsertFormStatus(loginForm);
-            setSubmitState(loginForm, true, 'Входим...');
-            setFormMessage(status, '');
-
-            try {
-                const payload = await api.login({
-                    email: loginForm.querySelector('#email').value.trim(),
-                    password: loginForm.querySelector('#password').value
-                });
-                persistSession(payload);
-                await loadReservations();
-                closeAuthModal();
-            } catch (error) {
-                setFormMessage(status, error.message || 'Не удалось войти.', true);
-            } finally {
-                setSubmitState(loginForm, false);
-            }
-        });
-    }
-
-    if (registerForm) {
-        registerForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const status = upsertFormStatus(registerForm);
-            const password = registerForm.querySelector('#regPassword').value;
-            const confirmPassword = registerForm.querySelector('#regConfirmPassword').value;
-
-            if (password !== confirmPassword) {
-                setFormMessage(status, 'Пароли не совпадают.', true);
-                return;
-            }
-
-            setSubmitState(registerForm, true, 'Создаем аккаунт...');
-            setFormMessage(status, '');
-
-            try {
-                const payload = await api.register({
-                    user_name: registerForm.querySelector('#regName').value.trim(),
-                    email: registerForm.querySelector('#regEmail').value.trim(),
-                    password
-                });
-                persistSession(payload);
-                await loadReservations();
-                closeAuthModal();
-            } catch (error) {
-                setFormMessage(status, error.message || 'Не удалось зарегистрироваться.', true);
-            } finally {
-                setSubmitState(registerForm, false);
-            }
-        });
-    }
-
-    if (editProfileForm) {
-        editProfileForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            if (!isLoggedIn()) {
-                openAuthModal('login');
-                return;
-            }
-
-            const status = upsertFormStatus(editProfileForm);
-            setSubmitState(editProfileForm, true, 'Сохраняем...');
-            setFormMessage(status, '');
-
-            try {
-                const payload = await api.updateProfile({
-                    user_name: editNameInput ? editNameInput.value.trim() : undefined,
-                    phone: editPhoneInput ? editPhoneInput.value.trim() : undefined
-                });
-                session.user = payload.result;
-                api.saveSession({ token: session.token, user: session.user });
-                renderUserState();
-                setFormMessage(status, 'Профиль обновлен.');
-            } catch (error) {
-                setFormMessage(status, error.message || 'Не удалось обновить профиль.', true);
-            } finally {
-                setSubmitState(editProfileForm, false);
-            }
-        });
-    }
-
-    if (supportForm) {
-        supportForm.removeAttribute('action');
-        supportForm.removeAttribute('method');
-
-        supportForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const status = upsertFormStatus(supportForm);
-            setSubmitState(supportForm, true, 'Отправляем...');
-            setFormMessage(status, '');
-
-            try {
-                await api.sendSupport({
-                    name: supportForm.querySelector('#supportName').value.trim(),
-                    email: supportForm.querySelector('#supportEmail').value.trim(),
-                    message: supportForm.querySelector('#supportMessage').value.trim()
-                });
-                supportForm.reset();
-                closeAuthModal();
-                if (thankYouModal) thankYouModal.style.display = 'block';
-            } catch (error) {
-                setFormMessage(status, error.message || 'Не удалось отправить сообщение.', true);
-            } finally {
-                setSubmitState(supportForm, false);
-            }
-        });
-    }
-
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (event) => {
-            event.preventDefault();
-            clearSession();
-            closeAuthModal();
-        });
-    }
-
-    if (bookingForm) {
-        if (reservationDateTime) {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset() + 30);
-            reservationDateTime.min = now.toISOString().slice(0, 16);
-        }
-
-        [reservationDateTime, reservationGuests, reservationDuration].forEach((input) => {
-            if (input) input.addEventListener('change', loadAvailability);
-        });
-
-        bookingForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            if (!isLoggedIn()) {
-                setFormMessage(bookingStatus, 'Сначала войди в аккаунт.', true);
-                openAuthModal('login');
-                return;
-            }
-
-            if (!tableSelect.value) {
-                setFormMessage(bookingStatus, 'Сначала выбери свободный столик.', true);
-                return;
-            }
-
-            setFormMessage(bookingStatus, '');
-            setSubmitState(bookingForm, true, 'Бронируем...');
-
-            try {
-                const payload = await api.createReservation({
-                    table_id: Number(tableSelect.value),
-                    reservation_time: reservationDateTime.value,
-                    duration_hours: Number(reservationDuration.value),
-                    guests_count: Number(reservationGuests.value),
-                    special_request: specialRequest.value.trim() || null
-                });
-                specialRequest.value = '';
-                await loadAvailability();
-                await loadReservations();
-                setFormMessage(
-                    bookingStatus,
-                    `Готово. Забронирован столик ${payload.result.table_number} на ${payload.result.reservation_time}.`
-                );
-            } catch (error) {
-                setFormMessage(bookingStatus, error.message || 'Не удалось создать бронь.', true);
-            } finally {
-                setSubmitState(bookingForm, false);
-            }
-        });
-    }
-
-    if (refreshReservationsBtn) {
-        refreshReservationsBtn.addEventListener('click', loadReservations);
-    }
-
-    if (reservationList) {
-        reservationList.addEventListener('click', handleReservationCancel);
-    }
-
-    renderUserState();
-    syncProfile();
-    loadReservations();
-    if (window.location.hash === '#booking') {
-        setTimeout(() => {
-            const bookingSection = document.getElementById('booking');
-            if (bookingSection) bookingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 200);
-    }
-    initHeroSparkles();
-});
+    <script src="js/api.js?v=20260522"></script>
+    <script src="js/site.js?v=20260522"></script>
+    <script src="js/dashboard.js?v=20260522"></script>
+</body>
+</html>

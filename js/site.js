@@ -1,0 +1,653 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const api = window.ScissorsApi;
+    const session = api.getSession();
+
+    const burgerBtn = document.getElementById('burgerBtn');
+    const sidePanel = document.getElementById('sidePanel');
+    const overlay = document.getElementById('overlay');
+    const closeBtn = document.getElementById('closeBtn');
+    const panelLinks = document.querySelectorAll('.side-panel a');
+
+    const authModal = document.getElementById('authModal');
+    const closeModalBtn = document.querySelector('.close-modal');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    const userAccountBtn = document.getElementById('userAccountBtn');
+    const userDropdownMenu = document.getElementById('userDropdownMenu');
+    const loggedOutView = document.getElementById('loggedOutView');
+    const loggedInView = document.getElementById('loggedInView');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const userAvatarWrapper = document.getElementById('userAvatarWrapper');
+
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const editProfileForm = document.getElementById('editProfileForm');
+    const supportForm = document.getElementById('supportForm');
+
+    const switchToRegister = document.getElementById('switchToRegister');
+    const switchToLogin = document.getElementById('switchToLogin');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const editProfileLink = document.getElementById('editProfileLink');
+    const supportLink = document.getElementById('supportLink');
+
+    const editNameInput = document.getElementById('editName');
+    const editPhoneInput = document.getElementById('editPhone');
+    const editAvatarInput = document.getElementById('editAvatar');
+
+    const thankYouModal = document.getElementById('thankYouModal');
+    const thankYouOkBtn = document.getElementById('thankYouOkBtn');
+
+    const bookingForm = document.getElementById('bookingForm');
+    const reservationDateTime = document.getElementById('reservationDateTime');
+    const reservationGuests = document.getElementById('reservationGuests');
+    const reservationDuration = document.getElementById('reservationDuration');
+    const tableSelect = document.getElementById('tableSelect');
+    const specialRequest = document.getElementById('specialRequest');
+    const bookingStatus = document.getElementById('bookingStatus');
+    const reservationList = document.getElementById('reservationList');
+    const refreshReservationsBtn = document.getElementById('refreshReservationsBtn');
+
+    function toggleMenu() {
+        if (!burgerBtn || !sidePanel || !overlay) return;
+
+        burgerBtn.classList.toggle('active');
+        sidePanel.classList.toggle('active');
+        overlay.classList.toggle('active');
+        document.body.style.overflow = sidePanel.classList.contains('active') ? 'hidden' : '';
+    }
+
+    function activateTab(tabName) {
+        const authTabsRow = document.querySelector('.auth-tabs');
+        const isAuthTab = tabName === 'login' || tabName === 'register';
+
+        // Вкладки «Вход / Регистрация» нужны только при авторизации.
+        // В режимах «Редактировать профиль» и «Поддержка» строку вкладок прячем.
+        if (authTabsRow) authTabsRow.style.display = isAuthTab ? 'flex' : 'none';
+
+        tabBtns.forEach((btn) => {
+            btn.classList.toggle('active', btn.dataset.tab === tabName);
+        });
+
+        tabContents.forEach((content) => {
+            content.classList.toggle('active', content.id === `${tabName}Tab`);
+        });
+    }
+
+    function openAuthModal(tabName = 'login') {
+        if (!authModal) return;
+        authModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+
+        if (tabName === 'support' && supportForm && isLoggedIn()) {
+            const user = currentUser();
+            const nameInput = supportForm.querySelector('#supportName');
+            const emailInput = supportForm.querySelector('#supportEmail');
+
+            if (nameInput && !nameInput.value) nameInput.value = user.user_name || '';
+            if (emailInput && !emailInput.value) emailInput.value = user.email || '';
+        }
+
+        activateTab(tabName);
+    }
+
+    function closeAuthModal() {
+        if (!authModal) return;
+        authModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    function currentUser() {
+        return session.user || null;
+    }
+
+    function isLoggedIn() {
+        return Boolean(session.token && session.user);
+    }
+
+    function persistSession(payload) {
+        session.token = payload.access_token;
+        session.user = payload.user;
+        api.saveSession({ token: session.token, user: session.user });
+        renderUserState();
+    }
+
+    function clearSession() {
+        session.token = null;
+        session.user = null;
+        api.clearSession();
+        renderUserState();
+        renderReservations([]);
+    }
+
+    function setFormMessage(target, message, isError = false) {
+        if (!target) return;
+        target.textContent = message || '';
+        target.classList.toggle('is-error', isError);
+        target.classList.toggle('is-success', Boolean(message) && !isError);
+    }
+
+    function upsertFormStatus(form) {
+        if (!form) return null;
+
+        let status = form.querySelector('.form-status');
+        if (!status) {
+            status = document.createElement('p');
+            status.className = 'form-status';
+            form.appendChild(status);
+        }
+        return status;
+    }
+
+    function setSubmitState(form, busy, text) {
+        if (!form) return;
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (!submitButton) return;
+
+        if (!submitButton.dataset.defaultText) {
+            submitButton.dataset.defaultText = submitButton.textContent;
+        }
+
+        submitButton.disabled = busy;
+        submitButton.textContent = busy ? text : submitButton.dataset.defaultText;
+    }
+
+    function renderUserState() {
+        const user = currentUser();
+
+        if (loggedOutView) {
+            loggedOutView.style.display = user ? 'none' : 'block';
+        }
+
+        if (loggedInView) {
+            loggedInView.style.display = user ? 'block' : 'none';
+        }
+
+        if (userNameDisplay) {
+            userNameDisplay.textContent = user ? user.user_name : 'Гость Бара';
+        }
+
+        if (userAvatarWrapper) {
+            let avatarUrl = user && user.avatar ? user.avatar : '';
+            if (avatarUrl && !/^https?:\/\//i.test(avatarUrl)) {
+                avatarUrl = api.config.apiBase + avatarUrl;
+            }
+            if (avatarUrl) {
+                userAvatarWrapper.innerHTML =
+                    '<img src="' + avatarUrl + '" alt="avatar" ' +
+                    'style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">';
+            } else {
+                userAvatarWrapper.innerHTML = '<i class="fas fa-user user-avatar-icon"></i>';
+            }
+        }
+
+        if (editNameInput) {
+            editNameInput.value = user ? user.user_name : '';
+        }
+
+        if (editPhoneInput) {
+            const hint = editPhoneInput.parentElement ? editPhoneInput.parentElement.querySelector('.form-hint') : null;
+            editPhoneInput.value = user && user.phone ? user.phone : '';
+            if (hint) hint.textContent = 'Номер для связи по бронированию.';
+        }
+    }
+
+    async function syncProfile() {
+        if (!isLoggedIn()) return;
+
+        try {
+            const response = await api.getProfile();
+            session.user = response.result;
+            api.saveSession({ token: session.token, user: session.user });
+            renderUserState();
+        } catch (error) {
+            clearSession();
+        }
+    }
+
+    async function loadAvailability() {
+        if (!bookingForm || !reservationDateTime || !reservationGuests || !reservationDuration || !tableSelect) {
+            return;
+        }
+
+        const dateValue = reservationDateTime.value;
+        if (!dateValue) {
+            tableSelect.innerHTML = '<option value="">Сначала выбери дату и время</option>';
+            return;
+        }
+
+        setFormMessage(bookingStatus, 'Проверяем свободные столики...');
+
+        try {
+            const response = await api.getAvailability({
+                reservation_time: dateValue,
+                guests_count: reservationGuests.value,
+                duration_hours: reservationDuration.value
+            });
+
+            const availableTables = response.data.filter((item) => item.is_available);
+            if (!availableTables.length) {
+                tableSelect.innerHTML = '<option value="">Свободных столиков нет</option>';
+                setFormMessage(bookingStatus, 'На выбранное время свободных столиков нет.', true);
+                return;
+            }
+
+            tableSelect.innerHTML = availableTables
+                .map((item) => (
+                    `<option value="${item.id}">Столик ${item.table_number} · ${item.seats_count} мест</option>`
+                ))
+                .join('');
+
+            setFormMessage(bookingStatus, `Найдено столиков: ${availableTables.length}`);
+        } catch (error) {
+            tableSelect.innerHTML = '<option value="">Не удалось получить список</option>';
+            setFormMessage(bookingStatus, error.message || 'Не удалось проверить доступность.', true);
+        }
+    }
+
+    function renderReservations(items) {
+        if (!reservationList) return;
+
+        if (!isLoggedIn()) {
+            reservationList.innerHTML = '<p class="reservation-empty">Войди в аккаунт, чтобы видеть свои брони.</p>';
+            return;
+        }
+
+        if (!items.length) {
+            reservationList.innerHTML = '<p class="reservation-empty">Броней пока нет.</p>';
+            return;
+        }
+
+        reservationList.innerHTML = items.map((item) => `
+            <article class="reservation-card">
+                <div>
+                    <h4>Столик ${item.table_number}</h4>
+                    <p>${item.reservation_time}</p>
+                    <p>${item.guests_count} гостей · ${item.duration_hours} ч.</p>
+                    <p>Статус: ${item.status}</p>
+                </div>
+                <button class="btn btn-small reservation-cancel" data-id="${item.id}" ${item.status === 'cancelled' ? 'disabled' : ''}>
+                    ${item.status === 'cancelled' ? 'Отменено' : 'Отменить'}
+                </button>
+            </article>
+        `).join('');
+    }
+
+    async function loadReservations() {
+        if (!reservationList) return;
+        if (!isLoggedIn()) {
+            renderReservations([]);
+            return;
+        }
+
+        reservationList.innerHTML = '<p class="reservation-empty">Загружаем брони...</p>';
+
+        try {
+            const response = await api.getMyReservations();
+            renderReservations(response.data);
+        } catch (error) {
+            reservationList.innerHTML = `<p class="reservation-empty">${error.message}</p>`;
+        }
+    }
+
+    async function handleReservationCancel(event) {
+        const button = event.target.closest('.reservation-cancel');
+        if (!button) return;
+
+        try {
+            await api.cancelReservation(button.dataset.id);
+            await loadReservations();
+            setFormMessage(bookingStatus, 'Бронь отменена.');
+        } catch (error) {
+            setFormMessage(bookingStatus, error.message || 'Не удалось отменить бронь.', true);
+        }
+    }
+
+    function initHeroSparkles() {
+        const container = document.getElementById('sparkles-container');
+        if (!container || typeof anime === 'undefined') return;
+
+        // На главной блёстки привязаны к логотипу .hero h1.
+        // На других страницах логотипа нет — там блёстки рассыпаются
+        // по всему экрану как фон (за плашкой контента).
+        const logo = document.querySelector('.hero h1');
+        const isFullscreen = !logo;
+
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+
+            const containerRect = container.getBoundingClientRect();
+
+            if (logo) {
+                const logoRect = logo.getBoundingClientRect();
+                const offsetX = (Math.random() - 0.5) * logoRect.width * 1.4;
+                const offsetY = (Math.random() - 0.5) * logoRect.height * 1.4;
+                sparkle.style.left = `${logoRect.left - containerRect.left + logoRect.width / 2 + offsetX}px`;
+                sparkle.style.top = `${logoRect.top - containerRect.top + logoRect.height / 2 + offsetY}px`;
+            } else {
+                // Случайная точка по всей площади экрана.
+                sparkle.style.left = `${Math.random() * containerRect.width}px`;
+                sparkle.style.top = `${Math.random() * containerRect.height}px`;
+            }
+
+            const size = 4 + Math.random() * 7;
+            sparkle.style.width = `${size}px`;
+            sparkle.style.height = `${size}px`;
+            container.appendChild(sparkle);
+
+            anime({
+                targets: sparkle,
+                opacity: [{ value: 0, duration: 250 }, { value: 1, duration: 700 }, { value: 0, duration: 450 }],
+                scale: [{ value: 0.5, duration: 250 }, { value: 1.15, duration: 700 }, { value: 0.6, duration: 450 }],
+                easing: 'easeInOutSine',
+                complete: () => sparkle.remove()
+            });
+        }
+
+        // Для фонового режима — начальная россыпь и более частое появление,
+        // чтобы блёстки были по всему экрану, а не редкими точками.
+        const burst = isFullscreen ? 4 : 1;
+        const intervalMs = isFullscreen ? 400 : 500;
+
+        for (let i = 0; i < (isFullscreen ? 16 : 1); i += 1) createSparkle();
+
+        const sparkleInterval = setInterval(() => {
+            for (let i = 0; i < burst; i += 1) createSparkle();
+        }, intervalMs);
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) clearInterval(sparkleInterval);
+        });
+    }
+
+    if (burgerBtn) burgerBtn.addEventListener('click', toggleMenu);
+    if (overlay) overlay.addEventListener('click', toggleMenu);
+    if (closeBtn) closeBtn.addEventListener('click', toggleMenu);
+    panelLinks.forEach((link) => link.addEventListener('click', () => {
+        if (sidePanel && sidePanel.classList.contains('active')) toggleMenu();
+    }));
+
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        const targetSelector = anchor.getAttribute('href');
+        if (!targetSelector || targetSelector === '#') return;
+
+        anchor.addEventListener('click', (event) => {
+            const target = document.querySelector(targetSelector);
+            if (!target) return;
+            event.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+
+    if (userAccountBtn) {
+        userAccountBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (!isLoggedIn()) {
+                openAuthModal('login');
+                return;
+            }
+            if (userDropdownMenu) {
+                userDropdownMenu.classList.toggle('active');
+            }
+        });
+    }
+
+    if (document.querySelector('#loggedOutView .dropdown-link')) {
+        document.querySelector('#loggedOutView .dropdown-link').addEventListener('click', (event) => {
+            event.preventDefault();
+            openAuthModal('login');
+        });
+    }
+
+    document.addEventListener('click', (event) => {
+        if (!userDropdownMenu || !userAccountBtn) return;
+        if (!userDropdownMenu.contains(event.target) && !userAccountBtn.contains(event.target)) {
+            userDropdownMenu.classList.remove('active');
+        }
+    });
+
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closeAuthModal);
+    window.addEventListener('click', (event) => {
+        if (event.target === authModal) closeAuthModal();
+        if (event.target === thankYouModal) thankYouModal.style.display = 'none';
+    });
+
+    tabBtns.forEach((btn) => {
+        btn.addEventListener('click', () => activateTab(btn.dataset.tab));
+    });
+
+    if (switchToRegister) {
+        switchToRegister.addEventListener('click', (event) => {
+            event.preventDefault();
+            activateTab('register');
+        });
+    }
+
+    if (switchToLogin) {
+        switchToLogin.addEventListener('click', (event) => {
+            event.preventDefault();
+            activateTab('login');
+        });
+    }
+
+    if (editProfileLink) {
+        editProfileLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            openAuthModal('editProfile');
+        });
+    }
+
+    if (supportLink) {
+        supportLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            openAuthModal('support');
+        });
+    }
+
+    if (thankYouOkBtn) {
+        thankYouOkBtn.addEventListener('click', () => {
+            if (thankYouModal) thankYouModal.style.display = 'none';
+        });
+    }
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const status = upsertFormStatus(loginForm);
+            setSubmitState(loginForm, true, 'Входим...');
+            setFormMessage(status, '');
+
+            try {
+                const payload = await api.login({
+                    email: loginForm.querySelector('#email').value.trim(),
+                    password: loginForm.querySelector('#password').value
+                });
+                persistSession(payload);
+                await loadReservations();
+                closeAuthModal();
+            } catch (error) {
+                setFormMessage(status, error.message || 'Не удалось войти.', true);
+            } finally {
+                setSubmitState(loginForm, false);
+            }
+        });
+    }
+
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const status = upsertFormStatus(registerForm);
+            const password = registerForm.querySelector('#regPassword').value;
+            const confirmPassword = registerForm.querySelector('#regConfirmPassword').value;
+
+            if (password !== confirmPassword) {
+                setFormMessage(status, 'Пароли не совпадают.', true);
+                return;
+            }
+
+            setSubmitState(registerForm, true, 'Создаем аккаунт...');
+            setFormMessage(status, '');
+
+            try {
+                const payload = await api.register({
+                    user_name: registerForm.querySelector('#regName').value.trim(),
+                    email: registerForm.querySelector('#regEmail').value.trim(),
+                    password
+                });
+                persistSession(payload);
+                await loadReservations();
+                closeAuthModal();
+            } catch (error) {
+                setFormMessage(status, error.message || 'Не удалось зарегистрироваться.', true);
+            } finally {
+                setSubmitState(registerForm, false);
+            }
+        });
+    }
+
+    if (editProfileForm) {
+        editProfileForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!isLoggedIn()) {
+                openAuthModal('login');
+                return;
+            }
+
+            const status = upsertFormStatus(editProfileForm);
+            setSubmitState(editProfileForm, true, 'Сохраняем...');
+            setFormMessage(status, '');
+
+            try {
+                const payload = await api.updateProfile({
+                    user_name: editNameInput ? editNameInput.value.trim() : undefined,
+                    phone: editPhoneInput ? editPhoneInput.value.trim() : undefined
+                });
+                session.user = payload.result;
+
+                // Если выбран файл аватара — загружаем его отдельным запросом.
+                const avatarFile = editAvatarInput && editAvatarInput.files
+                    ? editAvatarInput.files[0]
+                    : null;
+                if (avatarFile) {
+                    const avatarPayload = await api.uploadAvatar(avatarFile);
+                    session.user = avatarPayload.result;
+                    if (editAvatarInput) editAvatarInput.value = '';
+                }
+
+                api.saveSession({ token: session.token, user: session.user });
+                renderUserState();
+                setFormMessage(status, 'Профиль обновлен.');
+            } catch (error) {
+                setFormMessage(status, error.message || 'Не удалось обновить профиль.', true);
+            } finally {
+                setSubmitState(editProfileForm, false);
+            }
+        });
+    }
+
+    if (supportForm) {
+        supportForm.removeAttribute('action');
+        supportForm.removeAttribute('method');
+
+        supportForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const status = upsertFormStatus(supportForm);
+            setSubmitState(supportForm, true, 'Отправляем...');
+            setFormMessage(status, '');
+
+            try {
+                await api.sendSupport({
+                    name: supportForm.querySelector('#supportName').value.trim(),
+                    email: supportForm.querySelector('#supportEmail').value.trim(),
+                    message: supportForm.querySelector('#supportMessage').value.trim()
+                });
+                supportForm.reset();
+                closeAuthModal();
+                if (thankYouModal) thankYouModal.style.display = 'block';
+            } catch (error) {
+                setFormMessage(status, error.message || 'Не удалось отправить сообщение.', true);
+            } finally {
+                setSubmitState(supportForm, false);
+            }
+        });
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            clearSession();
+            closeAuthModal();
+        });
+    }
+
+    if (bookingForm) {
+        if (reservationDateTime) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset() + 30);
+            reservationDateTime.min = now.toISOString().slice(0, 16);
+        }
+
+        [reservationDateTime, reservationGuests, reservationDuration].forEach((input) => {
+            if (input) input.addEventListener('change', loadAvailability);
+        });
+
+        bookingForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            if (!isLoggedIn()) {
+                setFormMessage(bookingStatus, 'Сначала войди в аккаунт.', true);
+                openAuthModal('login');
+                return;
+            }
+
+            if (!tableSelect.value) {
+                setFormMessage(bookingStatus, 'Сначала выбери свободный столик.', true);
+                return;
+            }
+
+            setFormMessage(bookingStatus, '');
+            setSubmitState(bookingForm, true, 'Бронируем...');
+
+            try {
+                const payload = await api.createReservation({
+                    table_id: Number(tableSelect.value),
+                    reservation_time: reservationDateTime.value,
+                    duration_hours: Number(reservationDuration.value),
+                    guests_count: Number(reservationGuests.value),
+                    special_request: specialRequest.value.trim() || null
+                });
+                specialRequest.value = '';
+                await loadAvailability();
+                await loadReservations();
+                setFormMessage(
+                    bookingStatus,
+                    `Готово. Забронирован столик ${payload.result.table_number} на ${payload.result.reservation_time}.`
+                );
+            } catch (error) {
+                setFormMessage(bookingStatus, error.message || 'Не удалось создать бронь.', true);
+            } finally {
+                setSubmitState(bookingForm, false);
+            }
+        });
+    }
+
+    if (refreshReservationsBtn) {
+        refreshReservationsBtn.addEventListener('click', loadReservations);
+    }
+
+    if (reservationList) {
+        reservationList.addEventListener('click', handleReservationCancel);
+    }
+
+    renderUserState();
+    syncProfile();
+    loadReservations();
+    if (window.location.hash === '#booking') {
+        setTimeout(() => {
+            const bookingSection = document.getElementById('booking');
+            if (bookingSection) bookingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
+    }
+    initHeroSparkles();
+});
