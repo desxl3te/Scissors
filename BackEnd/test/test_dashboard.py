@@ -1,18 +1,13 @@
-# Импортируем pytest
 import pytest
 
-# Класс для тестов Flask-дашборда
-class TestDashboard:
-    # Тест корневого эндпоинта дашборда
-    def test_root(self, flask_client):
-        # Отправляем запрос на корень
+def test_root(flask_client):
+        # запрос на корень
         res = flask_client.get("/")
-        # Проверяем статус и фреймворк в ответе
+        # Проверка статус и фреймворк в ответе
         assert res.status_code == 200 and res.json["framework"] == "Flask"
 
-    # Тест получения данных дашборда
-    def test_dashboard_data(self, flask_client, mock_db_cursor):
-        # Настраиваем последовательность вызовов fetchone для dashboard_snapshot
+def test_dashboard_data(flask_client, mock_db_cursor):
+        # Настройка последовательности вызовов
         mock_db_cursor["cursor"].fetchone.side_effect = [
             {"total": 10},  # users
             {"total": 20},  # reservations
@@ -22,17 +17,17 @@ class TestDashboard:
             None,           # конец weekday_rows
             None,           # конец popular_tables
         ]
-        # Настраиваем fetchall для списков
+        # fetchall для списков
         mock_db_cursor["cursor"].fetchall.side_effect = [
             [],  # reservation_statuses
             [],  # weekday_load
             [],  # popular_tables
         ]
-        # Отправляем запрос на получение данных дашборда
+        # запрос на получение данных дашборда
         res = flask_client.get("/api/dashboard")
-        # Проверяем, что запрос успешен
+        # Проверка, что запрос успешен
         assert res.status_code == 200
-        # Получаем данные ответа
+        # данные ответа
         data = res.json
-        # Проверяем наличие ожидаемых секций
+        # Проверка на наличие ожидаемых секций
         assert "cards" in data and "charts" in data
