@@ -1,13 +1,18 @@
-
+// конфиг и константы
 const API_BASE_URL = 'http://127.0.0.1:8000/api';
+
+// ключ, под которым мы сохраняем данные в браузере
 const SESSION_KEY = 'scissors_session';
 
-// Токен хранится в общем для всего сайта ключе scissors_session ({ token, user }).
+// работа с токеном
 function getStoredToken() {
     try {
+        // пытаемся достать строку из localStorage и превратить её в объект
         const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+        // если объект есть и в нём есть токен — возвращаем его
         return session && session.token ? session.token : null;
     } catch (error) {
+        // если данные сдохли, просто возвращаем null
         return null;
     }
 }
@@ -17,56 +22,100 @@ function setStoredToken(token) {
     try {
         session = JSON.parse(localStorage.getItem(SESSION_KEY)) || {};
     } catch (error) {
+        // если ошибка чтения то пустой объект
         session = {};
     }
+    // обновляем token
     session.token = token;
+    // сохраняем объект обратно в localStorage (превращая в строку)
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
 }
 
-// Получаем имя пользователя из URL (?user=...)
-const urlParams = new URLSearchParams(window.location.search);
-const username = urlParams.get('user') || urlParams.get('name'); // поддерживаем оба варианта
+// подготовка данных
 
-// Загрузка данных пользователя
+// получаем параметры из адресной строки
+const urlParams = new URLSearchParams(window.location.search);
+
+const username = urlParams.get('user') || urlParams.get('name');
+
+// обновление интерфейса
+function fillProfile(user) {
+    document.getElementById('username').textContent = user.user_name || 'Не указан';
+    document.getElementById('email').textContent = user.email || 'Не указан';
+    document.getElementById('role').textContent = user.role || 'customer';
+
+    // форматируем дату создания
+    document.getElementById('createdAt').textContent = user.created_at
+        ? new Date(user.created_at).toLocaleDateString('ru-RU')
+        : '—';
+}
+
+
+function clearProfile() {
+    document.getElementById('username').textContent = 'Не указан';
+    document.getElementById('email').textContent = '—';
+    document.getElementById('role').textContent = '—';
+    document.getElementById('createdAt').textContent = '—';
+}
+
+// загрузка данных пользователя
 async function loadUserData() {
-    if (!username) {
-        document.getElementById('username').textContent = 'Не указан';
-        document.getElementById('email').textContent = '—';
-        document.getElementById('role').textContent = '—';
-        document.getElementById('createdAt').textContent = '—';
-        showMessage('Укажите пользователя: ?user=имя', 'error');
+    // если в ссылке есть имя пользователя
+    if (username) {
+        try {
+            // делаем запрос на получение публичного профиля
+            const res = await fetch(`${API_BASE_URL}/users/${encodeURIComponent(username)}`);
+
+            // проверяем статус ответа
+            if (!res.ok) {
+                if (res.status === 404) throw new Error('Пользователь не найден');
+                throw new Error('Ошибка загрузки');
+            }
+            // если всё ок, заполняем профиль данными
+            fillProfile(await res.json());
+        } catch (error) {
+            console.error('Ошибка загрузки:', error);
+            clearProfile();
+            // показываем имя из ссылки, но помечаем ошибку
+            document.getElementById('username').textContent = username;
+            document.getElementById('email').textContent = 'Ошибка';
+            showMessage(error.message, 'error');
+        }
+        return;
+    }
+
+    // если имени в ссылке нет, пробуем загрузить свой профиль по токену
+    const token = getStoredToken();
+
+    // если токена нет — пользователь не авторизован
+    if (!token) {
+        clearProfile();
+        showMessage('Войдите в аккаунт, чтобы увидеть профиль.', 'error');
         return;
     }
 
     try {
-        const res = await fetch(`${API_BASE_URL}/users/${username}`);
+        // Запрашиваем данные "о себе" с заголовком авторизации
+        const res = await fetch(`${API_BASE_URL}/auth/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
         if (!res.ok) {
-            if (res.status === 404) throw new Error('Пользователь не найден');
-            throw new Error('Ошибка загрузки');
+            if (res.status === 401) throw new Error('Токен просрочен, войдите заново');
+            throw new Error('Ошибка загрузки профиля');
         }
 
-        const user = await res.json();
-
-        // Заполняем поля профиля
-        document.getElementById('username').textContent = user.user_name || username;
-        document.getElementById('email').textContent = user.email || 'Не указан';
-        document.getElementById('role').textContent = user.role || 'customer';
-        document.getElementById('createdAt').textContent = user.created_at
-            ? new Date(user.created_at).toLocaleDateString('ru-RU')
-            : '—';
-
+        const data = await res.json();
+        fillProfile(data.result || data);
     } catch (error) {
         console.error('Ошибка загрузки:', error);
-        document.getElementById('username').textContent = username;
+        clearProfile();
         document.getElementById('email').textContent = 'Ошибка';
-        document.getElementById('role').textContent = '—';
-        document.getElementById('createdAt').textContent = '—';
         showMessage(error.message, 'error');
     }
 }
 
-// Показать текущий токен (если есть)
+// отображение токена
 function displayCurrentToken() {
     const token = getStoredToken();
     const tokenBox = document.getElementById('token');
@@ -76,14 +125,15 @@ function displayCurrentToken() {
             ? `${token.substring(0, 30)}...${token.substring(token.length - 20)}`
             : token;
         tokenBox.textContent = shortToken;
-        tokenBox.style.color = '#4caf50';
+        tokenBox.style.color = '#4caf50'; // зеленый цвет
     } else {
         tokenBox.textContent = 'Токен отсутствует. Войдите в аккаунт.';
-        tokenBox.style.color = '#ff9dbf';
+        tokenBox.style.color = '#ff9dbf'; // розовый цвет
     }
 }
 
-// Обновление токена
+// обновление токена
+
 async function refreshToken() {
     const oldToken = getStoredToken();
 
@@ -93,6 +143,7 @@ async function refreshToken() {
     }
 
     try {
+        // Отправляем запрос на обновление токена
         const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
             method: 'POST',
             headers: {
@@ -110,7 +161,7 @@ async function refreshToken() {
         setStoredToken(data.access_token);
 
         showMessage('✅ Токен успешно обновлён!', 'success');
-        displayCurrentToken();
+        displayCurrentToken(); // обновляем отображение токена на странице
 
         setTimeout(() => {
             const msgEl = document.getElementById('message');
@@ -123,18 +174,20 @@ async function refreshToken() {
     }
 }
 
-// Показ сообщений
+// система увед
 function showMessage(text, type) {
     const messageEl = document.getElementById('message');
     messageEl.textContent = text;
     messageEl.className = `message ${type}`;
     messageEl.style.display = 'block';
 }
- // === ИНИЦИАЛИЗАЦИЯ ===
+// запуск после загрузки страницы
 document.addEventListener('DOMContentLoaded', () => {
     loadUserData();
+    // инфа о токине
     displayCurrentToken();
 
+    //  обработчик клика на кнопку обновления токена
     const refreshBtn = document.getElementById('refreshBtn');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', refreshToken);

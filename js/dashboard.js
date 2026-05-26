@@ -1,10 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
+//кэшируем ссылки на эл дом
     const cardsContainer = document.getElementById('dashboardCards');
     const generatedAt = document.getElementById('dashboardGeneratedAt');
     const refreshButton = document.getElementById('refreshDashboardBtn');
     const statusLine = document.getElementById('dashboardStatus');
+    //глобал объект апи
     const api = window.ScissorsApi;
-
+    //прееменные для хранения графиков
     let statusChart = null;
     let weekdayChart = null;
     let tablesChart = null;
@@ -18,9 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function drawChart(targetId, currentChart, config) {
         const canvas = document.getElementById(targetId);
         if (!canvas || typeof Chart === 'undefined') return currentChart;
-
+        //удаляем старый график чтоб не накладывалось друг на друга
         if (currentChart) currentChart.destroy();
-
+        //создаем и возвращаем новый график
         return new Chart(canvas, config);
     }
 
@@ -28,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setStatus('Загружаем дашборд...');
 
         try {
+            //запрашиваем данные у бэка
             const payload = await api.getDashboard();
 
             if (cardsContainer) {
@@ -38,11 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     </article>
                 `).join('');
             }
-
+            //обновляем метку времени данных
             if (generatedAt) {
                 generatedAt.textContent = `Обновлено: ${payload.generated_at}`;
             }
-
+            //график 1: статус брони
             statusChart = drawChart('reservationStatusChart', statusChart, {
                 type: 'doughnut',
                 data: {
@@ -61,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             });
-
+            //график 2: загрузка по дням недели
             weekdayChart = drawChart('weekdayLoadChart', weekdayChart, {
                 type: 'bar',
                 data: {
@@ -85,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             });
-
+            //график 3: популярность столов
             tablesChart = drawChart('popularTablesChart', tablesChart, {
                 type: 'line',
                 data: {
@@ -112,13 +115,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             });
-
+            //показываем итог статистику
             setStatus(`Подтвержденных броней: ${payload.summary.confirmed_reservations}`);
         } catch (error) {
             setStatus(error.message || 'Не удалось загрузить дашборд.', true);
         }
     }
-
+    //привязка кнопки обновить
     if (refreshButton) {
         refreshButton.addEventListener('click', loadDashboard);
     }

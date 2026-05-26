@@ -12,7 +12,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 </head>
 <body>
-    <!-- === ШАПКА === -->
     <header>
         <div class="container header-content">
             <a href="index.html" class="logo">Scissors<span>Bar</span></a>
@@ -77,7 +76,6 @@
         </ul>
     </aside>
 
-    <!-- === МОДАЛЬНЫЕ ОКНА === -->
     <div id="authModal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
@@ -144,6 +142,11 @@
                                 <input type="tel" id="editPhone" placeholder="+7 (999) 123-45-67">
                                 <small class="form-hint">Номер для связи по бронированию.</small>
                         </div>
+                        <div class="form-group">
+                            <label for="editAvatar">Аватарка</label>
+                            <input type="file" id="editAvatar" accept="image/*">
+                            <small class="form-hint">Выберите файл, чтобы обновить фото.</small>
+                        </div>
                         <button type="submit" class="btn">Сохранить изменения</button>
                     </form>
                 </div>
@@ -172,32 +175,26 @@
         </div>
     </div>
 
-    <!-- фоновые блёстки (как на главной странице) -->
     <div id="sparkles-container"></div>
 
-    <!-- === КОНТЕНТ ТЕСТА === -->
     <main>
         <div class="container test-container">
             <h2 class="page-title">Тест на трезвость</h2>
             <p class="test-description">Пройди 10 случайных вопросов. Если ответишь верно на все — докажешь, что трезв как стеклышко!</p>
 
-            <!-- КНОПКА "ПРОЙТИ ТЕСТ" -->
             <div id="start-screen" class="start-screen">
                 <button id="startTestBtn" class="btn btn-large">ПРОЙТИ ТЕСТ</button>
             </div>
 
-            <!-- Контейнер для вопроса (скрыт по умолчанию) -->
             <div id="quiz-container" class="quiz-container">
                 <h3 id="question-text" class="question-text"></h3>
                 <div id="options-container" class="options-container"></div>
             </div>
 
-            <!-- Результат -->
             <div class="result-box" id="resultBox">
                 <h3 id="resultTitle" class="result-title">Результат:</h3>
                 <p id="resultText" class="result-text"></p>
 
-                <!-- ✅ ПРОМОКОД (Скрыт по умолчанию) -->
                 <div id="winnerCoupon" class="coupon" style="display: none;">
                     <i class="fas fa-glass-cheers coupon-icon"></i>
                     <h3>ТЫ ТРЕЗВ!</h3>
@@ -219,7 +216,6 @@
         </div>
     </footer>
 
-    <!-- === ОКНО УВЕДОМЛЕНИЯ "СПАСИБО" === -->
     <div id="thankYouModal" class="modal thank-you-modal">
         <div class="modal-content thank-you-content">
             <h2 class="modal-title">Спасибо!</h2>

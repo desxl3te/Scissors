@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="common.css">
 </head>
 <body>
-    <!-- === ШАПКА === -->
     <header>
         <div class="container header-content">
             <a href="index.html" class="logo">Scissors<span>Bar</span></a>
@@ -76,7 +75,6 @@
         </ul>
     </aside>
 
-    <!-- === МОДАЛЬНЫЕ ОКНА === -->
     <div id="authModal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
@@ -142,6 +140,11 @@
                                 <input type="tel" id="editPhone" placeholder="+7 (999) 123-45-67">
                                 <small class="form-hint">Номер для связи по бронированию.</small>
                         </div>
+                        <div class="form-group">
+                            <label for="editAvatar">Аватарка</label>
+                            <input type="file" id="editAvatar" accept="image/*">
+                            <small class="form-hint">Выберите файл, чтобы обновить фото.</small>
+                        </div>
                         <button type="submit" class="btn">Сохранить изменения</button>
                     </form>
                 </div>
@@ -170,7 +173,6 @@
         </div>
     </div>
 
-    <!-- === КОНТЕНТ СТРАНИЦЫ МЕРОПРИЯТИЯ === -->
     <main class="event-page-main">
         <div class="container">
             <a href="events.html" class="event-back"><i class="fas fa-arrow-left"></i> Вернуться к афише</a>
@@ -194,7 +196,6 @@
         </div>
     </main>
 
-    <!-- === ОКНО УВЕДОМЛЕНИЯ "СПАСИБО" === -->
     <div id="thankYouModal" class="modal thank-you-modal">
         <div class="modal-content thank-you-content">
             <h2 class="modal-title">Спасибо!</h2>

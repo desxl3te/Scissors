@@ -1,53 +1,55 @@
+//загрузка хтмл
 document.addEventListener('DOMContentLoaded', () => {
+    // api
     const api = window.ScissorsApi;
     const session = api.getSession();
-
+    //бургер кнопка
     const burgerBtn = document.getElementById('burgerBtn');
     const sidePanel = document.getElementById('sidePanel');
     const overlay = document.getElementById('overlay');
     const closeBtn = document.getElementById('closeBtn');
-    const panelLinks = document.querySelectorAll('.side-panel a');
-
+    const panelLinks = document.querySelectorAll('.side-panel a'); //ссылки в меню
+    //окно авторизации
     const authModal = document.getElementById('authModal');
     const closeModalBtn = document.querySelector('.close-modal');
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-
+    const tabBtns = document.querySelectorAll('.tab-btn'); //кнопки вкладок
+    const tabContents = document.querySelectorAll('.tab-content'); //содержание
+    //акк пользователя
     const userAccountBtn = document.getElementById('userAccountBtn');
     const userDropdownMenu = document.getElementById('userDropdownMenu');
-    const loggedOutView = document.getElementById('loggedOutView');
-    const loggedInView = document.getElementById('loggedInView');
-    const userNameDisplay = document.getElementById('userNameDisplay');
-    const userAvatarWrapper = document.getElementById('userAvatarWrapper');
-
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const editProfileForm = document.getElementById('editProfileForm');
-    const supportForm = document.getElementById('supportForm');
-
-    const switchToRegister = document.getElementById('switchToRegister');
-    const switchToLogin = document.getElementById('switchToLogin');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const editProfileLink = document.getElementById('editProfileLink');
-    const supportLink = document.getElementById('supportLink');
-
+    const loggedOutView = document.getElementById('loggedOutView'); //вид для неавторизованных
+    const loggedInView = document.getElementById('loggedInView'); //вид для авторизованных
+    const userNameDisplay = document.getElementById('userNameDisplay'); //name
+    const userAvatarWrapper = document.getElementById('userAvatarWrapper'); //avatar
+    //формы
+    const loginForm = document.getElementById('loginForm'); //вход
+    const registerForm = document.getElementById('registerForm'); //регистрация
+    const editProfileForm = document.getElementById('editProfileForm'); //редактирование профиля
+    const supportForm = document.getElementById('supportForm'); //поддержка
+    //кнопки переключения вкладок
+    const switchToRegister = document.getElementById('switchToRegister'); //ссылка зарегаться
+    const switchToLogin = document.getElementById('switchToLogin'); //ссылка войти
+    const logoutBtn = document.getElementById('logoutBtn'); //ссылка выход
+    const editProfileLink = document.getElementById('editProfileLink');//ссылка редактировать
+    const supportLink = document.getElementById('supportLink'); //ссылка поддержка
+    //поля редакт профиля
     const editNameInput = document.getElementById('editName');
     const editPhoneInput = document.getElementById('editPhone');
     const editAvatarInput = document.getElementById('editAvatar');
-
+    //окно спасибо
     const thankYouModal = document.getElementById('thankYouModal');
     const thankYouOkBtn = document.getElementById('thankYouOkBtn');
-
+    //форма бронирования
     const bookingForm = document.getElementById('bookingForm');
-    const reservationDateTime = document.getElementById('reservationDateTime');
-    const reservationGuests = document.getElementById('reservationGuests');
-    const reservationDuration = document.getElementById('reservationDuration');
-    const tableSelect = document.getElementById('tableSelect');
-    const specialRequest = document.getElementById('specialRequest');
-    const bookingStatus = document.getElementById('bookingStatus');
-    const reservationList = document.getElementById('reservationList');
-    const refreshReservationsBtn = document.getElementById('refreshReservationsBtn');
-
+    const reservationDateTime = document.getElementById('reservationDateTime'); //дата и время
+    const reservationGuests = document.getElementById('reservationGuests'); //скок гостей
+    const reservationDuration = document.getElementById('reservationDuration'); //длительность
+    const tableSelect = document.getElementById('tableSelect'); //выбор столика
+    const specialRequest = document.getElementById('specialRequest'); //пожелания
+    const bookingStatus = document.getElementById('bookingStatus'); //статус-соо
+    const reservationList = document.getElementById('reservationList'); //список броней
+    const refreshReservationsBtn = document.getElementById('refreshReservationsBtn'); //кнопка обновления
+    //переключение бокового меню
     function toggleMenu() {
         if (!burgerBtn || !sidePanel || !overlay) return;
 
@@ -56,13 +58,11 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.classList.toggle('active');
         document.body.style.overflow = sidePanel.classList.contains('active') ? 'hidden' : '';
     }
-
+    //переключение вкладок в модалке
     function activateTab(tabName) {
         const authTabsRow = document.querySelector('.auth-tabs');
         const isAuthTab = tabName === 'login' || tabName === 'register';
 
-        // Вкладки «Вход / Регистрация» нужны только при авторизации.
-        // В режимах «Редактировать профиль» и «Поддержка» строку вкладок прячем.
         if (authTabsRow) authTabsRow.style.display = isAuthTab ? 'flex' : 'none';
 
         tabBtns.forEach((btn) => {
@@ -73,12 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
             content.classList.toggle('active', content.id === `${tabName}Tab`);
         });
     }
-
+    //открытие модалки
     function openAuthModal(tabName = 'login') {
         if (!authModal) return;
         authModal.style.display = 'block';
         document.body.style.overflow = 'hidden';
-
+        // если откр вкл поддержка и пользовтель зашел в профиль то подставляем его данные
         if (tabName === 'support' && supportForm && isLoggedIn()) {
             const user = currentUser();
             const nameInput = supportForm.querySelector('#supportName');
@@ -90,28 +90,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
         activateTab(tabName);
     }
-
+    //закрытие модалки
     function closeAuthModal() {
         if (!authModal) return;
         authModal.style.display = 'none';
         document.body.style.overflow = '';
     }
-
+    //получение текущего пользователя
     function currentUser() {
         return session.user || null;
     }
-
+    //авторизован ли пользователь?
     function isLoggedIn() {
         return Boolean(session.token && session.user);
     }
-
+    //сохранение данных (после входа/регистрации)
     function persistSession(payload) {
         session.token = payload.access_token;
         session.user = payload.user;
         api.saveSession({ token: session.token, user: session.user });
         renderUserState();
     }
-
+    //очистка при выходе
     function clearSession() {
         session.token = null;
         session.user = null;
@@ -119,14 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
         renderUserState();
         renderReservations([]);
     }
-
+    //показ соо под формами
     function setFormMessage(target, message, isError = false) {
         if (!target) return;
         target.textContent = message || '';
-        target.classList.toggle('is-error', isError);
-        target.classList.toggle('is-success', Boolean(message) && !isError);
+        target.classList.toggle('is-error', isError); //если ошибка красный
+        target.classList.toggle('is-success', Boolean(message) && !isError); //зеленый если все заебись
     }
-
+    //создание и получение эл-та для статуса
     function upsertFormStatus(form) {
         if (!form) return null;
 
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return status;
     }
-
+    //блокировка кнопки
     function setSubmitState(form, busy, text) {
         if (!form) return;
         const submitButton = form.querySelector('button[type="submit"]');
@@ -148,13 +148,13 @@ document.addEventListener('DOMContentLoaded', () => {
             submitButton.dataset.defaultText = submitButton.textContent;
         }
 
-        submitButton.disabled = busy;
+        submitButton.disabled = busy; //блок и разблок
         submitButton.textContent = busy ? text : submitButton.dataset.defaultText;
     }
-
+    //обнова интерфейса после входв/выхода
     function renderUserState() {
         const user = currentUser();
-
+        //скрытие блока вход и профиль
         if (loggedOutView) {
             loggedOutView.style.display = user ? 'none' : 'block';
         }
@@ -162,11 +162,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (loggedInView) {
             loggedInView.style.display = user ? 'block' : 'none';
         }
-
+        //обновляем им в меню
         if (userNameDisplay) {
             userNameDisplay.textContent = user ? user.user_name : 'Гость Бара';
         }
-
+        //обновляем аву
         if (userAvatarWrapper) {
             let avatarUrl = user && user.avatar ? user.avatar : '';
             if (avatarUrl && !/^https?:\/\//i.test(avatarUrl)) {
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hint) hint.textContent = 'Номер для связи по бронированию.';
         }
     }
-
+    //синхронизация профиля с сервером
     async function syncProfile() {
         if (!isLoggedIn()) return;
 
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
             clearSession();
         }
     }
-
+    //загрузка доступных столиков
     async function loadAvailability() {
         if (!bookingForm || !reservationDateTime || !reservationGuests || !reservationDuration || !tableSelect) {
             return;
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 guests_count: reservationGuests.value,
                 duration_hours: reservationDuration.value
             });
-
+            //фильтруем ток свободные столики
             const availableTables = response.data.filter((item) => item.is_available);
             if (!availableTables.length) {
                 tableSelect.innerHTML = '<option value="">Свободных столиков нет</option>';
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setFormMessage(bookingStatus, error.message || 'Не удалось проверить доступность.', true);
         }
     }
-
+    //отображение списка броней
     function renderReservations(items) {
         if (!reservationList) return;
 
@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </article>
         `).join('');
     }
-
+    //загрузка броней с сервера
     async function loadReservations() {
         if (!reservationList) return;
         if (!isLoggedIn()) {
@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reservationList.innerHTML = `<p class="reservation-empty">${error.message}</p>`;
         }
     }
-
+    //обработка отмены брони
     async function handleReservationCancel(event) {
         const button = event.target.closest('.reservation-cancel');
         if (!button) return;
@@ -302,14 +302,11 @@ document.addEventListener('DOMContentLoaded', () => {
             setFormMessage(bookingStatus, error.message || 'Не удалось отменить бронь.', true);
         }
     }
-
+    //инициализация блесток
     function initHeroSparkles() {
         const container = document.getElementById('sparkles-container');
         if (!container || typeof anime === 'undefined') return;
 
-        // На главной блёстки привязаны к логотипу .hero h1.
-        // На других страницах логотипа нет — там блёстки рассыпаются
-        // по всему экрану как фон (за плашкой контента).
         const logo = document.querySelector('.hero h1');
         const isFullscreen = !logo;
 
@@ -326,16 +323,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 sparkle.style.left = `${logoRect.left - containerRect.left + logoRect.width / 2 + offsetX}px`;
                 sparkle.style.top = `${logoRect.top - containerRect.top + logoRect.height / 2 + offsetY}px`;
             } else {
-                // Случайная точка по всей площади экрана.
                 sparkle.style.left = `${Math.random() * containerRect.width}px`;
                 sparkle.style.top = `${Math.random() * containerRect.height}px`;
             }
-
+            //размер
             const size = 4 + Math.random() * 7;
             sparkle.style.width = `${size}px`;
             sparkle.style.height = `${size}px`;
             container.appendChild(sparkle);
-
+            //анимация появления
             anime({
                 targets: sparkle,
                 opacity: [{ value: 0, duration: 250 }, { value: 1, duration: 700 }, { value: 0, duration: 450 }],
@@ -344,9 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 complete: () => sparkle.remove()
             });
         }
-
-        // Для фонового режима — начальная россыпь и более частое появление,
-        // чтобы блёстки были по всему экрану, а не редкими точками.
+        //настройка частоты
         const burst = isFullscreen ? 4 : 1;
         const intervalMs = isFullscreen ? 400 : 500;
 
@@ -360,14 +354,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (document.hidden) clearInterval(sparkleInterval);
         });
     }
-
-    if (burgerBtn) burgerBtn.addEventListener('click', toggleMenu);
-    if (overlay) overlay.addEventListener('click', toggleMenu);
-    if (closeBtn) closeBtn.addEventListener('click', toggleMenu);
-    panelLinks.forEach((link) => link.addEventListener('click', () => {
+    //бургер клик
+    if (burgerBtn) burgerBtn.addEventListener('click', toggleMenu); //открыть меню
+    if (overlay) overlay.addEventListener('click', toggleMenu); //закрыть по клику меню
+    if (closeBtn) closeBtn.addEventListener('click', toggleMenu); //закрыть по крестику
+    panelLinks.forEach((link) => link.addEventListener('click', () => { //закрыть после выбора пункт
         if (sidePanel && sidePanel.classList.contains('active')) toggleMenu();
     }));
-
+    //плавный скрол по якорям
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
         const targetSelector = anchor.getAttribute('href');
         if (!targetSelector || targetSelector === '#') return;
@@ -379,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
             target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     });
-
+    //выпадающее меню акк
     if (userAccountBtn) {
         userAccountBtn.addEventListener('click', (event) => {
             event.stopPropagation();
@@ -392,25 +386,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
+    //клик по войти рег
     if (document.querySelector('#loggedOutView .dropdown-link')) {
         document.querySelector('#loggedOutView .dropdown-link').addEventListener('click', (event) => {
             event.preventDefault();
             openAuthModal('login');
         });
     }
-
+    //закрытие меню при клике
     document.addEventListener('click', (event) => {
         if (!userDropdownMenu || !userAccountBtn) return;
         if (!userDropdownMenu.contains(event.target) && !userAccountBtn.contains(event.target)) {
             userDropdownMenu.classList.remove('active');
         }
     });
-
-    if (closeModalBtn) closeModalBtn.addEventListener('click', closeAuthModal);
+    //модалка закрытие
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closeAuthModal); //по крестику
     window.addEventListener('click', (event) => {
-        if (event.target === authModal) closeAuthModal();
-        if (event.target === thankYouModal) thankYouModal.style.display = 'none';
+        if (event.target === authModal) closeAuthModal(); //по клику на фон
+        if (event.target === thankYouModal) thankYouModal.style.display = 'none'; //окно спасибр
     });
 
     tabBtns.forEach((btn) => {
@@ -444,13 +438,13 @@ document.addEventListener('DOMContentLoaded', () => {
             openAuthModal('support');
         });
     }
-
+    //кнопка ок спс
     if (thankYouOkBtn) {
         thankYouOkBtn.addEventListener('click', () => {
             if (thankYouModal) thankYouModal.style.display = 'none';
         });
     }
-
+    //форма входа
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -473,14 +467,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
+    //форма регистрации
     if (registerForm) {
         registerForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             const status = upsertFormStatus(registerForm);
             const password = registerForm.querySelector('#regPassword').value;
             const confirmPassword = registerForm.querySelector('#regConfirmPassword').value;
-
+            //совпадают ли пароли
             if (password !== confirmPassword) {
                 setFormMessage(status, 'Пароли не совпадают.', true);
                 return;
@@ -505,7 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
+    //редактирование профиля
     if (editProfileForm) {
         editProfileForm.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -525,7 +519,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 session.user = payload.result;
 
-                // Если выбран файл аватара — загружаем его отдельным запросом.
                 const avatarFile = editAvatarInput && editAvatarInput.files
                     ? editAvatarInput.files[0]
                     : null;
@@ -545,7 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
+    //поддержка
     if (supportForm) {
         supportForm.removeAttribute('action');
         supportForm.removeAttribute('method');
@@ -572,7 +565,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
+    //выход
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (event) => {
             event.preventDefault();
@@ -580,7 +573,7 @@ document.addEventListener('DOMContentLoaded', () => {
             closeAuthModal();
         });
     }
-
+    //форма брони
     if (bookingForm) {
         if (reservationDateTime) {
             const now = new Date();
@@ -631,23 +624,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
+//обновление броней
     if (refreshReservationsBtn) {
         refreshReservationsBtn.addEventListener('click', loadReservations);
     }
-
+//отмена
     if (reservationList) {
         reservationList.addEventListener('click', handleReservationCancel);
     }
 
     renderUserState();
-    syncProfile();
     loadReservations();
-    if (window.location.hash === '#booking') {
-        setTimeout(() => {
-            const bookingSection = document.getElementById('booking');
-            if (bookingSection) bookingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 200);
-    }
     initHeroSparkles();
 });
