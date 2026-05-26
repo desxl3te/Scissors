@@ -1,181 +1,162 @@
-CREATE DATABASE  IF NOT EXISTS `scissors_bar` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `scissors_bar`;
--- MySQL dump 10.13  Distrib 8.0.45, for Win64 (x86_64)
---
--- Host: localhost    Database: scissors_bar
--- ------------------------------------------------------
--- Server version	8.0.45
+DROP DATABASE IF EXISTS scissors_bar;
+CREATE DATABASE scissors_bar;
+USE scissors_bar;
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+-- категории меню
+CREATE TABLE categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE
+);
 
---
--- Table structure for table `menu_items`
---
+INSERT INTO categories (name) VALUES
+('Коктейль'), ('Шот'), ('Закуска'), ('Основное блюдо');
 
-DROP TABLE IF EXISTS `menu_items`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `menu_items` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `category` enum('Коктейль','Шот','Закуска','Основное блюдо') NOT NULL,
-  `price` decimal(10,2) NOT NULL,
-  `description` text,
-  `available` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`id`),
-  CONSTRAINT `menu_items_chk_1` CHECK ((`price` >= 0))
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+-- столики (6 столиков)
+CREATE TABLE tables (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    table_number INT UNIQUE NOT NULL,
+    seats_count INT NOT NULL CHECK (seats_count BETWEEN 1 AND 12),
+    is_active BOOLEAN DEFAULT TRUE
+);
 
---
--- Dumping data for table `menu_items`
---
+INSERT INTO tables (table_number, seats_count) VALUES
+(1, 2), (2, 2), (3, 4), (4, 4), (5, 6), (6, 8);
 
-LOCK TABLES `menu_items` WRITE;
-/*!40000 ALTER TABLE `menu_items` DISABLE KEYS */;
-INSERT INTO `menu_items` VALUES (1,'Blessing wife','Коктейль',550.00,'Водка, ягодный ликёр, сок лайма, сахарный сироп, шоколадная крошка, бузина',1),(2,'Third Wheel','Коктейль',590.00,'Джин, ликёр апельсин, спрайт, лёд, кондитерская вишня, цедра апельсина',1),(3,'Send nudes','Коктейль',620.00,'Джин, водка, сок персика, сахарный сироп, долька персика, фигурка из белого шоколада',1),(4,'Pussy boy','Коктейль',580.00,'Текила, клубничный ликер, ванильный сироп, листья мяты',1),(5,'One Night Stand','Коктейль',650.00,'Джин, водка, спрайт, ежевичный сироп, лёд, ежевика',1),(6,'Future Ex','Шот',250.00,'Водка, ликёр вишня, сок лайма, сахарный сироп, вишня',1),(7,'Broken Vows','Шот',270.00,'Бурбон, Ангостура, ликёр амаро, карамельная сетка',1),(8,'Bad Decision','Шот',290.00,'Джин, водка, лайм, сахарный сироп, черная Роза, кондитерская вишня',1),(9,'Licked her','Шот',260.00,'Водка, амаретто, Бейлис, цедра апельсина',1),(10,'Сырная тарелка','Закуска',890.00,'3 сорта сыра, орехи, мёд, виноград',1),(11,'Карпаччо из говядины','Закуска',750.00,'Пармезан, руккола, трюфельное масло',1),(12,'Креветки в темпуре','Закуска',690.00,'Сладкий чили, кунжут, лайм',1),(13,'Брускетты с лососем','Закуска',590.00,'Творожный сыр, красная икра, укроп',1),(14,'Острые крылышки','Закуска',550.00,'Соус барбекю, сельдерей, блю чиз',1),(15,'Бургер \"Scissors\"','Основное блюдо',850.00,'Двойная говядина, бекон, сыр чеддер, соус \"Ножницы\"',1),(16,'Стейк Рибай','Основное блюдо',1890.00,'Мраморная говядина, картофель гратен, розмарин',1),(17,'Паста Карбонара','Основное блюдо',690.00,'Панчетта, пармезан, желток, чёрный перец',1),(18,'Ризотто с грибами','Основное блюдо',720.00,'Белые грибы, трюфельное масло, пармезан',1),(19,'Салат с ростбифом','Основное блюдо',650.00,'Ростбиф, микс салата, перечный соус, пармезан',1);
-/*!40000 ALTER TABLE `menu_items` ENABLE KEYS */;
-UNLOCK TABLES;
+-- меню + секретное меню
+CREATE TABLE menu_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    category_id INT NOT NULL,
+    price DECIMAL(10,2) NOT NULL CHECK (price >= 0),
+    is_secret BOOLEAN DEFAULT FALSE,
+    description TEXT,
+    available BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
+);
 
---
--- Table structure for table `reservations`
---
+-- коктейли (category_id = 1)
+INSERT INTO menu_items (name, category_id, price, is_secret, description) VALUES
+('Blessing wife', 1, 550.00, FALSE, 'Водка, ягодный ликёр, сок лайма, сахарный сироп, шоколадная крошка, бузина'),
+('Third Wheel', 1, 590.00, FALSE, 'Джин, ликёр апельсин, спрайт, лёд, кондитерская вишня, цедра апельсина'),
+('Send nudes', 1, 620.00, FALSE, 'Джин, водка, сок персика, сахарный сироп, долька персика, фигурка из белого шоколада'),
+('Pussy boy', 1, 580.00, FALSE, 'Текила, клубничный ликер, ванильный сироп, листья мяты'),
+('One Night Stand', 1, 650.00, FALSE, 'Джин, водка, спрайт, ежевичный сироп, лёд, ежевика');
 
-DROP TABLE IF EXISTS `reservations`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `reservations` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `table_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `reservation_time` datetime NOT NULL,
-  `duration_hours` int DEFAULT '2',
-  `guests_count` int NOT NULL,
-  `status` enum('confirmed','cancelled','completed') DEFAULT 'confirmed',
-  `special_request` text,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_reservation` (`table_id`,`reservation_time`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `reservations_ibfk_1` FOREIGN KEY (`table_id`) REFERENCES `tables` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `reservations_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `reservations_chk_1` CHECK ((`duration_hours` between 1 and 4)),
-  CONSTRAINT `reservations_chk_2` CHECK ((`guests_count` > 0))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+-- шоты (category_id = 2)
+INSERT INTO menu_items (name, category_id, price, is_secret, description) VALUES
+('Future Ex', 2, 250.00, FALSE, 'Водка, ликёр вишня, сок лайма, сахарный сироп, вишня'),
+('Broken Vows', 2, 270.00, FALSE, 'Бурбон, Ангостура, ликёр амаро, карамельная сетка'),
+('Bad Decision', 2, 290.00, FALSE, 'Джин, водка, лайм, сахарный сироп, черная Роза, кондитерская вишня'),
+('Licked her', 2, 260.00, FALSE, 'Водка, амаретто, Бейлис, цедра апельсина');
 
---
--- Dumping data for table `reservations`
---
+-- закуски (category_id = 3)
+INSERT INTO menu_items (name, category_id, price, is_secret, description) VALUES
+('Сырная тарелка', 3, 890.00, FALSE, 'Ассорти из выдержанных сыров с виноградом, орехами, мёдом и гриссини'),
+('Карпаччо из говядины', 3, 750.00, FALSE, 'Тонко нарезанная говядина с рукколой, пармезаном, каперсами и трюфельным маслом'),
+('Креветки в темпуре', 3, 690.00, FALSE, 'Хрустящие креветки в темпуре с острым соусом чили и лаймом'),
+('Брускетты с лососем', 3, 590.00, FALSE, 'Хрустящие брускетты с слабосолёным лососем, сливочным сыром, огурцом и микрозеленью'),
+('Острые крылышки', 3, 550.00, FALSE, 'Куриные крылышки в остром соусе барбекю с кунжутом и зелёным луком. Подаются с соусом блю чиз');
 
-LOCK TABLES `reservations` WRITE;
-/*!40000 ALTER TABLE `reservations` DISABLE KEYS */;
-/*!40000 ALTER TABLE `reservations` ENABLE KEYS */;
-UNLOCK TABLES;
+-- основные блюда (category_id = 4)
+INSERT INTO menu_items (name, category_id, price, is_secret, description) VALUES
+('Бургер "Scissors"', 4, 850.00, FALSE, 'Сочная говяжья котлета, сыр чеддер, бекон, томаты, маринованные огурцы, листья салата и фирменный соус'),
+('Стейк Рибай', 4, 1890.00, FALSE, 'Премиальный стейк Рибай из мраморной говядины с розмарином, чесноком и морской солью'),
+('Паста Карбонара', 4, 690.00, FALSE, 'Классическая паста с беконом, яичным желтком, пармезаном и чёрным перцем'),
+('Ризотто с грибами', 4, 720.00, FALSE, 'Нежное ризотто с белыми грибами, пармезаном и трюфельным маслом'),
+('Салат с ростбифом', 4, 650.00, FALSE, 'Ростбиф из говядины с миксом салатов, вялеными томатами, пармезаном и медово-горчичной заправкой');
 
---
--- Table structure for table `secret_menu`
---
+-- секретный шот (is_secret = TRUE)
+INSERT INTO menu_items (name, category_id, price, is_secret, description) VALUES
+('The Deer Penis', 2, 350.00, TRUE, 'Секретный шот. Джин, настойка чили, ягермейстер.');
 
-DROP TABLE IF EXISTS `secret_menu`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `secret_menu` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `category` enum('Коктейль','Шот','Закуска','Основное блюдо') NOT NULL,
-  `price` decimal(10,2) NOT NULL,
-  `description` text,
-  `unlock_trigger` varchar(50) DEFAULT 'scissors_click',
-  PRIMARY KEY (`id`),
-  CONSTRAINT `secret_menu_chk_1` CHECK ((`price` >= 0))
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+-- пользователи
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_name VARCHAR(50) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    phone VARCHAR(20),
+    avatar VARCHAR(255) DEFAULT NULL,
+    role ENUM('admin', 'manager', 'customer') DEFAULT 'customer',
+    is_active BOOLEAN DEFAULT TRUE,
+    total_visits INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
---
--- Dumping data for table `secret_menu`
---
+INSERT INTO users (user_name, password_hash, email, phone, role) VALUES
+('admin', SHA2('admin', 256), 'admin@scissors.bar', '+1234567890', 'admin');
 
-LOCK TABLES `secret_menu` WRITE;
-/*!40000 ALTER TABLE `secret_menu` DISABLE KEYS */;
-INSERT INTO `secret_menu` VALUES (1,'The Deer Penis','Шот',350.00,'Секретный шот. Открывается только по нажатию на ножницы ✂️  Джин, настойка чили, ягермейстер','scissors_click');
-/*!40000 ALTER TABLE `secret_menu` ENABLE KEYS */;
-UNLOCK TABLES;
+-- афиша мероприятий
+CREATE TABLE events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_date DATE NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    event_type ENUM('Вечеринка', 'Мастер-класс', 'Стендап', 'Концерт', 'Закрытая вечеринка', 'Финал месяца') NOT NULL,
+    description TEXT NOT NULL,
+    start_time TIME NOT NULL,
+    price DECIMAL(10,2) DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    image_url VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
---
--- Table structure for table `tables`
---
+-- брони
+CREATE TABLE reservations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    table_id INT NOT NULL,
+    user_id INT NOT NULL,
+    event_id INT NULL,
+    reservation_time DATETIME NOT NULL,
+    duration_hours INT DEFAULT 2 CHECK (duration_hours BETWEEN 1 AND 4),
+    guests_count INT NOT NULL CHECK (guests_count > 0),
+    status ENUM('confirmed', 'cancelled', 'completed') DEFAULT 'confirmed',
+    special_request TEXT,
+    
+    FOREIGN KEY (table_id) REFERENCES tables(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE SET NULL,
+    
+    UNIQUE KEY unique_reservation (table_id, reservation_time)
+);
 
-DROP TABLE IF EXISTS `tables`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tables` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `table_number` int NOT NULL,
-  `seats_count` int NOT NULL,
-  `is_active` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `table_number` (`table_number`),
-  CONSTRAINT `tables_chk_1` CHECK ((`seats_count` between 1 and 12))
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+-- добавление мероприятий из афиши
+INSERT INTO events (event_date, title, event_type, description, start_time, price) VALUES
+('2025-05-28', 'Ladies Night: Розовая Пятница', 'Вечеринка', 'Специальная программа для девушек: скидки на коктейли, живая музыка и розыгрыш призов от бара.', '20:00:00', 0),
+('2025-05-30', 'Cocktail Masterclass', 'Мастер-класс', 'Научись готовить фирменные коктейли Scissors Bar под руководством шеф-бармена.', '19:00:00', 1500),
+('2025-06-05', 'Start of Summer Party', 'Вечеринка', 'Открываем летний сезон громко! Dg set танцы до утра и летние коктейли по сниженной цене.', '22:00:00', 0),
+('2025-06-12', 'Stand Up Night: Женский взгляд', 'Стендап', 'Вечер юмора с лучшими девушками-комиксами города. Смех, шутки и отличное настроение.', '20:00:00', 0),
+('2025-06-19', 'Rock Covers Live', 'Концерт', 'Кавер-группа "Pink Noise" исполнит хиты рок-сцены в женском вокале.', '21:00:00', 0),
+('2025-06-26', 'Scissors Secret Party', 'Закрытая вечеринка', 'Закрытое мероприятие для своих. Вход только по спискам или брони столика.', '23:00:00', 0),
+('2025-06-30', 'Hello July: Прощай, Июнь!', 'Финал месяца', 'Грандиозная вечеринка в честь конца месяца. Подводим итоги и встречаем июль ярко!', '20:00:00', 0);
+-- аля проверка 
+SELECT * FROM categories;
+SELECT * FROM events;
+SELECT id, name, category_id, is_secret, price FROM menu_items LIMIT 5;
+SELECT id, name, price FROM menu_items WHERE is_secret = TRUE;
+SELECT * FROM tables;
+SELECT id, user_name, role FROM users;
+-- ===== тестовые данные =====
+USE scissors_bar;
 
---
--- Dumping data for table `tables`
---
+-- добавление тестового пользователя
+INSERT IGNORE INTO users (id, user_name, password_hash, email, phone, avatar, role) 
+VALUES (1, 'test_user', SHA2('123456', 256), 'test@scissors.bar', '+79991234567', 'https://example.com/avatar.jpg', 'customer');
 
-LOCK TABLES `tables` WRITE;
-/*!40000 ALTER TABLE `tables` DISABLE KEYS */;
-INSERT INTO `tables` VALUES (1,1,2,1),(2,2,2,1),(3,3,4,1),(4,4,4,1),(5,5,6,1);
-/*!40000 ALTER TABLE `tables` ENABLE KEYS */;
-UNLOCK TABLES;
+-- очистка старых тестовых броней
+SET SQL_SAFE_UPDATES = 0;
+DELETE FROM reservations WHERE user_id = 1 AND reservation_time < NOW();
+SET SQL_SAFE_UPDATES = 1;
 
---
--- Table structure for table `users`
---
-
-DROP TABLE IF EXISTS `users`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `users` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `user_name` varchar(50) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `total_visits` int DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `user_name` (`user_name`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `users`
---
-
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'admin','dummy_hash_will_be_replaced_by_backend','admin@scissors.bar','+1234567890',0,'2026-04-03 19:34:10');
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2026-04-03 22:34:39
+-- добавление тестовых броней
+INSERT INTO reservations (table_id, user_id, event_id, reservation_time, duration_hours, guests_count, status) VALUES
+(1, 1, NULL, '2026-04-10 18:00:00', 2, 2, 'confirmed'),
+(1, 1, NULL, '2026-04-15 19:00:00', 1,  2, 'confirmed'),
+(1, 1, NULL, '2026-04-20 20:00:00', 3, 2, 'confirmed'),
+(2, 1, NULL, '2026-04-11 19:00:00', 2, 4, 'confirmed'),
+(2, 1, NULL, '2026-04-18 18:30:00', 2, 2, 'confirmed'),
+(3, 1, NULL, '2026-04-12 20:00:00', 3, 4, 'confirmed'),
+(3, 1, NULL, '2026-04-19 19:00:00', 4, 4, 'confirmed'),
+(3, 1, NULL, '2026-04-25 21:00:00', 1, 3, 'confirmed'),
+(4, 1, NULL, '2026-04-13 18:00:00', 1, 2, 'confirmed'),
+(5, 1, NULL, '2026-04-14 19:30:00', 3, 5, 'confirmed'),
+(6, 1, NULL, '2026-04-21 20:30:00', 4, 6, 'cancelled');

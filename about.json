@@ -2,11 +2,19 @@
   "project_name": "Scissors Bar",
   "description": "Бар с острыми впечатлениями. Смелые коктейли. Ночь в твоем вкусе.",
   "team": [
-    {"role": "Backend", "name": "Твое Имя"},
-    {"role": "Frontend", "name": "Имя Фронтендера"},
-    {"role": "Database Engineer", "name": "Имя DBA"},
-    {"role": "QA", "name": "Имя Тестировщика"}
+    {
+      "role": "Backend",
+      "responsibility": "FastAPI, авторизация, бронирование и интеграция с MySQL"
+    },
+    {
+      "role": "Frontend",
+      "responsibility": "HTML/CSS/JS, формы, личный кабинет и дашборд-страницы"
+    },
+    {
+      "role": "Database",
+      "responsibility": "MySQL-схема, SQL-запросы и тестовые данные"
+    }
   ],
-  "technologies": ["FastAPI", "Flask", "MySQL", "HTML/CSS/JS"],
+  "technologies": ["FastAPI", "Flask", "MySQL", "HTML", "CSS", "JavaScript"],
   "year": 2026
 }

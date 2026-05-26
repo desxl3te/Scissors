@@ -1,0 +1,16 @@
+{
+  "status_labels": {
+    "confirmed": "Подтверждено",
+    "cancelled": "Отменено",
+    "completed": "Завершено"
+  },
+  "weekday_order": [
+    {"key": "Monday", "label": "Пн"},
+    {"key": "Tuesday", "label": "Вт"},
+    {"key": "Wednesday", "label": "Ср"},
+    {"key": "Thursday", "label": "Чт"},
+    {"key": "Friday", "label": "Пт"},
+    {"key": "Saturday", "label": "Сб"},
+    {"key": "Sunday", "label": "Вс"}
+  ]
+}
